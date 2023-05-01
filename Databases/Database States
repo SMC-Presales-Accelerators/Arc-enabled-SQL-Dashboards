@@ -1,0 +1,14 @@
+resources
+	| where type =~ 'Microsoft.Sql/servers/databases' or type == 'microsoft.azurearcdata/sqlserverinstances/databases' or type == 'microsoft.sql/managedinstances/databases'
+	| extend propertiesState = tostring(properties.state)
+	| extend propertiesStatus = tostring(properties.status)
+	| extend state = case(    propertiesState == "Degraded", "Degraded",    
+							  propertiesState == "Warned", "Warned",    
+							  propertiesState == "Disabled", "Disabled",    
+							  propertiesState == "Ready", "Available",    
+							  propertiesState == "Reserved", "Reserved",    
+							  isempty(propertiesState), "",    "Unknown")
+ //   | extend type = case(     ['type'] == "microsoft.sql/servers", "Azure SQL",
+ //                             ['type'] == "microsoft.sql/managedinstances", "SQL MI",
+ //                             ['type'] == "microsoft.azurearcdata/sqlserverinstances", "On-Premises",
+ //                             isempty(['type']), "",    "Unknown")

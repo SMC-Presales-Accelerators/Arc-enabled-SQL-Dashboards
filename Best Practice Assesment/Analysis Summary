@@ -1,0 +1,31 @@
+SqlAssessment_CL
+| where TimeGenerated >= ago(7d) // Hard Code time to match how often you are running BPA assessments
+| extend parse_csv(RawData) // Raw Data is in CSV Format
+| project
+    TimeGenerated,
+    RuleId = RawData[2],
+    FullRuleName = RawData[3],
+    Description = RawData[4],
+    RuleUrl = RawData[5],
+    // 1 = Server, 2 = Database
+    Scope = case(
+        toint(RawData[6]) == 1, "Server", 
+        toint(RawData[6]) == 2, "Database", 
+        "None"
+    ), // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore
+        Severity = case(
+        toint(RawData[8]) == 30, "1 - High", 
+        toint(RawData[8]) == 20, "2 - Medium", 
+        toint(RawData[8]) == 10, "3 - Low", 
+        toint(RawData[8]) == -1, "4 - Information", 
+        "4 - Information"
+    ),
+    Server = tostring(split(RawData[7], ":")[0]), // Split this and just have null in database for server level items
+    Database = tostring(split(RawData[7], ":")[1]),
+    InstanceName = RawData[11],
+    SuggestedAction = RawData[9],
+    Tags = RawData[10]
+| where Severity != "4 - Information"
+| summarize Findings = count() by Server, Severity
+| sort by Server, Severity asc
+| render columnchart
