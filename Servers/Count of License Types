@@ -1,0 +1,3 @@
+| where type == "microsoft.hybridcompute/machines/extensions"​
+| where properties.type in ("WindowsAgent.SqlServer","LinuxAgent.SqlServer")​
+| summarize count() by tostring(properties.settings.LicenseType)
