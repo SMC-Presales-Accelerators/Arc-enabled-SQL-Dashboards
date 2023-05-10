@@ -1,0 +1,4 @@
+// Count of all resources
+resources
+| where type == "microsoft.azurearcdata/sqlserverinstances/databases"
+| count 

@@ -1,0 +1,4 @@
+resources
+| where  type == "microsoft.azurearcdata/sqlserverinstances"
+| summarize Count=count() by iff(tostring(properties['azureDefenderStatus'])=="Unknown", "Not Protected",tostring(properties['azureDefenderStatus']))
+| order by Count desc

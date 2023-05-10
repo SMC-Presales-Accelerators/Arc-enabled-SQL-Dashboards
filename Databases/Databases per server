@@ -1,0 +1,5 @@
+resources
+| where  type == "microsoft.azurearcdata/sqlserverinstances/databases"
+| summarize Dbs=count(),Offline=sum(toint(iif(tostring(properties["state"])!="Online",1,0)))
+,SizeMB=sum(toint(iif(tostring(properties["sizeMB"])!="",properties["sizeMB"],0))) by Instances = tostring(split(tostring(id),"/")[8])
+| order by Offline

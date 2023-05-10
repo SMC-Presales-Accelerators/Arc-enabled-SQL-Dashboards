@@ -1,0 +1,46 @@
+resources
+	| where type =~ 'Microsoft.Sql/servers/databases' or type == 'microsoft.azurearcdata/sqlserverinstances/databases' or type == 'microsoft.sql/managedinstances/databases' or type == 'Microsoft.Sql/servers' or type == 'microsoft.azurearcdata/sqlserverinstances' or type == 'microsoft.sql/managedinstances'
+	| extend propertiesState = tostring(properties.state)
+	| extend propertiesStatus = tostring(properties.status)
+	| extend version = tostring(properties.currentVersion )
+	| extend vcore = tostring(properties.vCore)
+	| extend vcores = tostring(properties.vCores)
+	| extend SQLversion = case( substring(version, 0, 2) == "16", "SQL 2022",
+							substring(version, 0, 2) == "15", "SQL 2019",
+							substring(version, 0, 2) == "14", "SQL 2017",
+							substring(version, 0, 2) == "13", "SQL 2026",
+							substring(version, 0, 2) == "12", "SQL 2014",
+							substring(version, 0, 2) == "11", "SQL 2012",
+							substring(version, 0, 2) == "11", "SQL 2008 R2",
+							isempty(propertiesState), "",    "")
+	| extend edition = tostring(properties.edition)
+	| extend patch = tostring(properties.patchLevel)
+	| extend state = case(    propertiesState == "Degraded", "Degraded",    
+							  propertiesState == "Warned", "Warned",    
+							  propertiesState == "Disabled", "Disabled",    
+							  propertiesState == "Ready", "Available",    
+							  propertiesState == "Reserved", "Reserved",  
+							  propertiesStatus == "Connected", "Connected",  
+							  isempty(propertiesState), "",    "Unknown")
+    | extend type = case(     ['type'] == "microsoft.sql/servers", "Azure SQL",
+                              ['type'] == "microsoft.sql/managedinstances", "SQL MI",
+                              ['type'] == "microsoft.azurearcdata/sqlserverinstances", "On-Premises",
+                              isempty(['type']), "",    "")
+	| extend Cores = case (   vcore != "", tostring(vcore), 
+							  vcores != "", tostring(vcores),
+							  isempty(propertiesState), "",    "")
+	| extend propertiesState = tostring(properties.state)
+	| extend propertiesStatus = tostring(properties.status)
+	| extend state = case(    propertiesState == "Degraded", "Degraded",    
+							  propertiesState == "Warned", "Warned",    
+							  propertiesState == "Disabled", "Disabled",    
+							  propertiesState == "Ready", "Available",    
+							  propertiesState == "Reserved", "Reserved",
+							  propertiesState == "Online", "Online", 
+							  propertiesStatus == "Online", "Online", 
+							  isempty(propertiesState), "",    "Unknown")
+ //   | extend type = case(     ['type'] == "microsoft.sql/servers", "Azure SQL",
+ //                             ['type'] == "microsoft.sql/managedinstances", "SQL MI",
+ //                             ['type'] == "microsoft.azurearcdata/sqlserverinstances", "On-Premises",
+ //                             isempty(['type']), "",    "Unknown")
+	| project id, name, type, location, state, SQLversion,  edition, Cores, patch

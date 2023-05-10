@@ -1,0 +1,4 @@
+resources
+| where type == "microsoft.azurearcdata/sqlserverinstances"
+| summarize Count=sum(toint(properties['vCore'])) by  tostring(properties['edition'])
+| order by Count desc

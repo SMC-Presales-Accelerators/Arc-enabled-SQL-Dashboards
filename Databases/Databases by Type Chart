@@ -1,0 +1,11 @@
+//Chart - Top ten resource types by number of resources
+resources
+| where type =~ 'Microsoft.Sql/servers/databases' or type == 'microsoft.azurearcdata/sqlserverinstances/databases' or type == 'microsoft.sql/managedinstances/databases'
+    | extend type = case(     ['type'] == "microsoft.sql/servers/databases", "Azure SQL",
+                              ['type'] == "microsoft.sql/managedinstances/databases", "SQL MI",
+                              ['type'] == "microsoft.azurearcdata/sqlserverinstances/databases", "Arc SQL",
+                              isempty(['type']), "",    "Unknown")
+|summarize ResourceCount=count() by type
+| order by ResourceCount desc
+| take 10
+| project ["Resource Type"]=type, ["Resource Count"]=ResourceCount

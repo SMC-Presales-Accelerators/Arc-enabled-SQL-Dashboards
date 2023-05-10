@@ -1,0 +1,3 @@
+resources
+| where ['type']  =="microsoft.azurearcdata/sqlserverinstances/databases"
+| summarize Count=count() by Encrypte=iif(tostring(properties['databaseOptions'].isEncrypted)=="false","No", "Yes")

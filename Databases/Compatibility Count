@@ -1,0 +1,6 @@
+// If distinct count is small (e.g. < 1000)
+// run next query to get count of each value
+resources
+| where type == "microsoft.azurearcdata/sqlserverinstances/databases"
+|summarize Count=count() by tostring(properties['compatibilityLevel'])
+| order by Count desc

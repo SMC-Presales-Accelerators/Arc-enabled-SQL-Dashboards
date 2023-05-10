@@ -272,9 +272,9 @@ resources
 							  isempty(propertiesState), "",    "Unknown")
     | extend type = case(     ['type'] == "microsoft.sql/servers", "Azure SQL",
                               ['type'] == "microsoft.sql/managedinstances", "SQL MI",
-                              ['type'] == "microsoft.azurearcdata/sqlserverinstances", "On-Premises",
+                              ['type'] == "microsoft.azurearcdata/sqlserverinstances", "Arc SQL",
                               isempty(['type']), "",    "Unknown")
 	| extend Cores = case (   vcore != "", tostring(vcore), 
 							  vcores != "", tostring(vcores),
 							  isempty(propertiesState), "",    "N/A")
-	| project id, name, type, SQLversion,  edition, license, Cores
+	| project ["Server"] = name, ["Type"] = type, ["Version"] = SQLversion,  ["Edition"] = edition, ["L-Type"] = license, Cores //id, 

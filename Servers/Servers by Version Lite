@@ -1,0 +1,3 @@
+resources
+| where type == "microsoft.azurearcdata/sqlserverinstances"
+| summarize Count=count() by tostring(properties['version'])

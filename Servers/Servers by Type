@@ -1,0 +1,10 @@
+//Top ten resource types by number of resources
+resources
+| where type =~ 'Microsoft.Sql/servers' or type == 'microsoft.azurearcdata/sqlserverinstances' or type == 'microsoft.sql/managedinstances'
+    | extend type = case(     ['type'] == "microsoft.sql/servers", "Azure SQL",
+                              ['type'] == "microsoft.sql/managedinstances", "SQL MI",
+                              ['type'] == "microsoft.azurearcdata/sqlserverinstances", "Arc SQL
+|summarize ResourceCount=count() by type
+| order by ResourceCount desc
+| take 10
+| project ["Resource Type"]=type, ["Resource Count"]=ResourceCount
