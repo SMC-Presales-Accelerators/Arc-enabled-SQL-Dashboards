@@ -288,7 +288,7 @@ if($valid.Result) {
     if($valid.Response) {
         $SelectedRg = $MostUsedArcRG
     } else {
-        $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist):"
+        $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist)"
     }
     Write-Host $SelectedRg -ForegroundColor Cyan -NoNewline
     Write-Host " has been selected!"
@@ -381,7 +381,7 @@ $confirmation = ProceedValidation
 if ($confirmation -eq "y") {
     Write-Host "`r`nProceeding with the deployment!" -ForegroundColor Green
     Start-Sleep -s 2 #Quick sleep before a new section and clear host
-    DeployTemplate -template $template
+    DeployResources -ResourceGroup $SelectedRg -BpaWorkspace $SelectedBpaWorkspace -PerformanceInsightsWorkspace $SelectedPerformanceInsightsWorkspace
 } else {
   exit
 }
