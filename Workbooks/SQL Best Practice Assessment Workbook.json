@@ -1,0 +1,121 @@
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SqlAssessment_CL\r\n// Hard Code time to match how often you are running BPA assessments\r\n| where TimeGenerated >= ago(7d)\r\n// Raw Data is in CSV Format\r\n| extend parse_csv(RawData) \r\n| project\r\n    TimeGenerated,\r\n    RuleId = RawData[2],\r\n    FullRuleName = RawData[3],\r\n    Description = RawData[4],\r\n    RuleUrl = RawData[5],\r\n    // 1 = Server, 2 = Database\r\n    Scope = case(\r\n        toint(RawData[6]) == 1, \"Server\", \r\n        toint(RawData[6]) == 2, \"Database\", \r\n        \"None\"\r\n    ),\r\n    // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\r\n    Severity = case(\r\n        toint(RawData[8]) == 30, \"High\", \r\n        toint(RawData[8]) == 20, \"Medium\", \r\n        toint(RawData[8]) == 10, \"Low\", \r\n        toint(RawData[8]) == -1, \"Information\", \r\n        \"Information\"\r\n    ),\r\n    // Split this and just have null in database for server level items\r\n    Server = tostring(split(RawData[7], \":\")[0]),\r\n    Database = tostring(split(RawData[7], \":\")[1]),\r\n    InstanceName = RawData[11],\r\n    SuggestedAction = RawData[9],\r\n    Tags = RawData[10],\r\n    id = _ResourceId\r\n| where Severity != 'Information'\r\n| summarize Total = count(Severity), sevH=countif(Severity=='High'), sevM=countif(Severity=='Medium'), sevL=countif(Severity=='Low') by Server, id",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 604800000
+        },
+        "exportFieldName": "id",
+        "exportParameterName": "sqlResource",
+        "exportDefaultValue": "All",
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{BpaLogAnalyticsWorkspace}"
+        ],
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "Server",
+              "formatter": 1
+            },
+            {
+              "columnMatch": "Total",
+              "formatter": 1
+            },
+            {
+              "columnMatch": "sevH",
+              "formatter": 4,
+              "formatOptions": {
+                "palette": "redBright"
+              }
+            },
+            {
+              "columnMatch": "sevM",
+              "formatter": 4,
+              "formatOptions": {
+                "palette": "yellow"
+              }
+            },
+            {
+              "columnMatch": "sevL",
+              "formatter": 4,
+              "formatOptions": {
+                "palette": "blue"
+              }
+            }
+          ],
+          "labelSettings": [
+            {
+              "columnId": "id",
+              "label": "Resource"
+            },
+            {
+              "columnId": "sevH",
+              "label": "High"
+            },
+            {
+              "columnId": "sevM",
+              "label": "Medium"
+            },
+            {
+              "columnId": "sevL",
+              "label": "Low"
+            }
+          ]
+        }
+      },
+      "name": "query - 0"
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "SqlAssessment_CL\r\n// Hard Code time to match how often you are running BPA assessments\r\n| where TimeGenerated >= ago(7d)\r\n// Raw Data is in CSV Format\r\n| extend parse_csv(RawData) \r\n| project\r\n    TimeGenerated,\r\n    RuleId = RawData[2],\r\n    FullRuleName = RawData[3],\r\n    Description = RawData[4],\r\n    RuleUrl = RawData[5],\r\n    // 1 = Server, 2 = Database\r\n    Scope = case(\r\n        toint(RawData[6]) == 1, \"Server\", \r\n        toint(RawData[6]) == 2, \"Database\", \r\n        \"None\"\r\n    ),\r\n    // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\r\n    Severity = case(\r\n        toint(RawData[8]) == 30, \"Sev1\", \r\n        toint(RawData[8]) == 20, \"Sev2\", \r\n        toint(RawData[8]) == 10, \"Sev3\", \r\n        toint(RawData[8]) == -1, \"Information\", \r\n        \"Information\"\r\n    ),\r\n    // Split this and just have null in database for server level items\r\n    Server = tostring(split(RawData[7], \":\")[0]),\r\n    Database = tostring(split(RawData[7], \":\")[1]),\r\n    InstanceName = RawData[11],\r\n    SuggestedAction = RawData[9],\r\n    Tags = RawData[10],\r\n    id = _ResourceId\r\n| where Severity != 'Information'\r\n| where '{sqlResource}' == 'All' or id == '{sqlResource}'\r\n| project Severity, id, InstanceName, Scope, FullRuleName, Description, RuleUrl, SuggestedAction\r\n| order by id, Severity asc\r\n",
+        "size": 0,
+        "timeContext": {
+          "durationMs": 604800000
+        },
+        "queryType": 0,
+        "resourceType": "microsoft.operationalinsights/workspaces",
+        "crossComponentResources": [
+          "{BpaLogAnalyticsWorkspace}"
+        ],
+        "gridSettings": {
+          "formatters": [
+            {
+              "columnMatch": "InstanceName",
+              "formatter": 1
+            },
+            {
+              "columnMatch": "FullRuleName",
+              "formatter": 1,
+              "formatOptions": {
+                "linkColumn": "RuleUrl",
+                "linkTarget": "Url"
+              }
+            },
+            {
+              "columnMatch": "RuleUrl",
+              "formatter": 5
+            },
+            {
+              "columnMatch": "Severity",
+              "formatter": 11
+            }
+          ]
+        }
+      },
+      "name": "query - 1"
+    }
+  ],
+  "fallbackResourceIds": [
+    "Azure Monitor"
+  ],
+  "$schema": "https://raw.githubusercontent.com/microsoft/Application-Insights-Workbooks/master/schema/workbook.json"
+}
