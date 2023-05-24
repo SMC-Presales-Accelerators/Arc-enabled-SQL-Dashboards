@@ -285,7 +285,11 @@ while(!($valid.Result)) {
 }
 
 if($valid.Result) {
-    $SelectedRg = $MostUsedArcRG
+    if($valid.Response) {
+        $SelectedRg = $MostUsedArcRG
+    } else {
+        $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist):"
+    }
     Write-Host $SelectedRg -ForegroundColor Cyan -NoNewline
     Write-Host " has been selected!"
 }
