@@ -93,8 +93,6 @@ function DeployWorkbook {
 
     $SerializedTemplateJson = $WorkbookJson.psobject.BaseObject | ConvertTo-Json -Compress
 
-    Write-Host $SerializedTemplateJson
-
     $WorkbookArmTemplate = @'
     {
         "contentVersion": "1.0.0.0",
@@ -158,8 +156,6 @@ function DeployWorkbook {
       # Because we send this is a json object, we also have to remove the extra double quotes
       $ArmTemplate = $ArmTemplate.Replace("""{SerializedJson}""", $SerializedTemplateJson)
 
-      Write-Host $ArmTemplate
-
       $TemplateObject = ConvertFrom-Json $ArmTemplate -AsHashtable
 
       $Deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateObject $TemplateObject
@@ -210,8 +206,8 @@ function DeployResources {
     New-AzPortalDashboard -DashboardPath "$ArcSqlInstancesDashboardId.json" -Name $ArcSqlInstancesDashboardId -ResourceGroupName $ResourceGroup
 
     #To properly link to the Workbooks created above, we need to build the links based on the resource id
-    $BpaWorkbookLink = CreateWorkbookLink -WorkbookId $BpaWorkbookId -ResourceGroup $ResourceGroup
-    $LicensingWorkbookLink = CreateWorkbookLink -WorkbookId $LicensingWorkbookId -ResourceGroup $ResourceGroup
+    $BpaWorkbookLink = CreateWorkbookLink -WorkbookId $BpaWorkbookId.Value -ResourceGroup $ResourceGroup
+    $LicensingWorkbookLink = CreateWorkbookLink -WorkbookId $LicensingWorkbookId.Value -ResourceGroup $ResourceGroup
 
     $json = Get-Content -Path '.\Dashboards\Azure Arc Enabled SQL Server Demo Dashboard.json' -Raw
     $json = $json.Replace("INSERT LOCATION", $RgLocation)
