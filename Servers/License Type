@@ -1,0 +1,12 @@
+//Extension details including license type resources​
+| where type == "microsoft.hybridcompute/machines/extensions"​
+| where properties.type in ("WindowsAgent.SqlServer","LinuxAgent.SqlServer")​
+| project name, resourceGroup, subscriptionId,​
+   properties.provisioningState,​
+   properties.settings.LicenseType,​
+   properties.instanceView.status.message,​
+   properties.instanceView.typeHandlerVersion,​
+   properties.ExcludedSqlInstances,​
+   iff(notnull(properties.settings.ExternalPolicyBasedAuthorization),"Purview enabled",""),​
+   iff(notnull(properties.settings.AzureAD),"Azure AD enabled",""),​
+   iff(notnull(properties.settings.AssessmentSettings),"BPA enabled","")​

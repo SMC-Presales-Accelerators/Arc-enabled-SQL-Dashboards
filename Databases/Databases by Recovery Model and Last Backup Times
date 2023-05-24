@@ -1,0 +1,23 @@
+resources
+| where type == "microsoft.azurearcdata/sqlserverinstances/databases"
+| where name!= "tempdb"
+| extend servername = toupper(tostring(split(id, "/")[8]))
+| extend prop_db = parse_xml(properties)
+| extend prop_db_recoveryMode = prop_db.recoveryMode
+| extend prop_db_databaseCreationDate = todatetime(prop_db.databaseCreationDate)
+| extend prop_db_backupInformation = prop_db.backupInformation
+//| extend prop_db_backupInformation_lastFullBackup = todatetime(prop_db.backupInformation.lastFullBackup)
+| extend prop_db_backupInformation_lastFullBackup = iif(
+    isnull(prop_db.backupInformation.lastFullBackup),
+    "Never",
+    tostring(format_datetime(todatetime(prop_db.backupInformation.lastFullBackup), 'MM/dd/yyyy h:mm tt')))
+| extend calc_lastBackupAgeDays = iff(
+    isnull(todatetime(prop_db.backupInformation.lastFullBackup)),
+    "", //datetime_diff('Day',now(),prop_db_databaseCreationDate),
+    tostring(datetime_diff('Day',now(),todatetime(prop_db.backupInformation.lastFullBackup))))
+| project 
+    Server = servername,
+    Database = name, ['Recovery Model'] = prop_db_recoveryMode, 
+    ['Last Full Backup'] = prop_db_backupInformation_lastFullBackup,
+    ['Days Since Last Backup'] = calc_lastBackupAgeDays
+| sort by Server asc , Database asc

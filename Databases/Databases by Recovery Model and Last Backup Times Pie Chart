@@ -1,0 +1,23 @@
+resources
+| where type == "microsoft.azurearcdata/sqlserverinstances/databases"
+| where name!="tempdb"
+| extend prop_db=parse_xml(properties)
+| extend prop_db_recoveryMode = prop_db.recoveryMode
+| extend prop_db_databaseCreationDate = todatetime(prop_db.databaseCreationDate)
+| extend prop_db_backupInformation = prop_db.backupInformation
+| extend prop_db_backupInformation_lastFullBackup = todatetime(prop_db.backupInformation.lastFullBackup)
+| extend calc_lastBackupAgeDays = iff(
+    isnull(prop_db_backupInformation_lastFullBackup),
+    datetime_diff('Day',now(),prop_db_databaseCreationDate),
+    datetime_diff('Day',now(),prop_db_backupInformation_lastFullBackup))
+| extend Backup_1day = iif(calc_lastBackupAgeDays <=1,1,0)
+| extend Backup_7day = iif(calc_lastBackupAgeDays >1  and calc_lastBackupAgeDays <=7,1,0)
+| extend Backup_over7day = iif(calc_lastBackupAgeDays >7, 1, 0)
+| extend Backup_desc = case(
+isnull(prop_db_backupInformation_lastFullBackup), "No Backups",
+datetime_diff('Day',now(),prop_db_backupInformation_lastFullBackup) <=1, "1 Day",
+datetime_diff('Day',now(),prop_db_backupInformation_lastFullBackup) <= 7, "7 Days",
+datetime_diff('Day',now(),prop_db_backupInformation_lastFullBackup) <= 30, "1 Month",
+"Older than a Month")
+| project database_name = name, RecoveryModel = prop_db_recoveryMode, Last_Full_Backup = prop_db_backupInformation_lastFullBackup , Backup_Age_Days = calc_lastBackupAgeDays ,Backup_1day ,Backup_7day ,Backup_over7day, Backup_desc
+| summarize Count=count() by Backup_desc
