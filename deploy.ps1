@@ -159,6 +159,9 @@ function DeployWorkbook {
       $TemplateObject = ConvertFrom-Json $ArmTemplate -AsHashtable
 
       $Deployment = New-AzResourceGroupDeployment -ResourceGroupName $ResourceGroup -TemplateObject $TemplateObject
+
+      Write-Host "Finished Deploying Workbook $WorkbookDisplayName"
+
       return $Deployment.Outputs["workbookId"]
 }
 
@@ -203,7 +206,10 @@ function DeployResources {
     $json = $json.Replace("INSERT LOCATION", $RgLocation)
     $ArcSqlInstancesDashboardId = New-Guid
     $json | Out-File -Path "$ArcSqlInstancesDashboardId.json"
-    New-AzPortalDashboard -DashboardPath "$ArcSqlInstancesDashboardId.json" -Name $ArcSqlInstancesDashboardId -ResourceGroupName $ResourceGroup
+    $ArcInstanceDashboardResult = New-AzPortalDashboard -DashboardPath "$ArcSqlInstancesDashboardId.json" -Name $ArcSqlInstancesDashboardId -ResourceGroupName $ResourceGroup
+    if($ArcInstanceDashboardResult) {
+        Write-Host "Finished Deploying Arc SQL Server Instances Dashboard"
+    }
 
     #To properly link to the Workbooks created above, we need to build the links based on the resource id
     $BpaWorkbookLink = CreateWorkbookLink -WorkbookId $BpaWorkbookId.Value -ResourceGroup $ResourceGroup
@@ -219,7 +225,13 @@ function DeployResources {
     $json = $json.Replace("{SQLLicensingWorkbookLink}", $LicensingWorkbookLink)
     $ArcSqlDashboardId = New-Guid
     $json | Out-File -Path "$ArcSqlDashboardId.json"
-    New-AzPortalDashboard -DashboardPath "$ArcSqlDashboardId.json" -Name $ArcSqlDashboardId -ResourceGroupName $ResourceGroup
+    $ArcSqlDashboardResult = New-AzPortalDashboard -DashboardPath "$ArcSqlDashboardId.json" -Name $ArcSqlDashboardId -ResourceGroupName $ResourceGroup
+    if($ArcSqlDashboardResult) {
+        Write-Host "Finished Deploying Azure Arc Enabled SQL Server Demo Dashboard"
+    }
+
+    Write-Host "`r`nResources have been fully deployed to your resource group " -NoNewLine
+    Write-Host $ResourceGroup -ForegroundColor Cyan 
 }
 
 #Install Az-ConnectedMachine to allow for Extension Data Gathering
