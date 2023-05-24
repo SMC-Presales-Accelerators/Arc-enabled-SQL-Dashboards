@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Automatic Release on Tag
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on tag creation to push out a release
+  push:
+    tags:
+    - '*'
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+      
+      - name: Remove Queries from release
+        run: rm -rf ./Queries/
+      
+      # Fail build if any of the sub ids/local names are in the files
+      - name: Prevent hard coded values in release
+        run: |
+          $findcount=`grep -E '168a9a28-f769-4f1b-8038-4782329f7964|arc-la' */*.json | wc -l`
+          if [ $findcount -gt 0 ]
+          then
+            echo Found one of our hardcoded subscription ids or workspaces, please recheck the dashboard and workbook templates
+            exit 1
+          fi
+          
+      # Runs a single command using the runners shell
+      - name: Zip our deployment
+        run: zip -r -q arc-enabled-sql-dashboards.zip .
+      
+      - uses: ncipollo/release-action@v1
+        with:
+          artifacts: "arc-enabled-sql-dashboards.zip"
