@@ -296,7 +296,14 @@ if($valid.Result) {
     if($valid.Response) {
         $SelectedRg = $MostUsedArcRG
     } else {
-        $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist)"
+        $RgOutput = $null
+        while(!($RgOutput)) {
+            $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist)"
+            $RgOutput = Get-AzResourceGroup -Name $SelectedRg 2>$null
+            if(!($RgOutput)) {
+                Write-Warning "Resource Group $SelectedRg does not exist in this subscription."
+            }
+        }
     }
     Write-Host $SelectedRg -ForegroundColor Cyan -NoNewline
     Write-Host " has been selected!"
