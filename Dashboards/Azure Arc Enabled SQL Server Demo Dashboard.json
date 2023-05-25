@@ -1,0 +1,844 @@
+{
+  "properties": {
+    "lenses": {
+      "0": {
+        "order": 0,
+        "parts": {
+          "0": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 2,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/ClockPart",
+              "settings": {
+                "content": {
+                  "timeFormat": "h:mma",
+                  "timezoneId": "Central Standard Time",
+                  "version": 1
+                }
+              }
+            }
+          },
+          "1": {
+            "position": {
+              "x": 2,
+              "y": 0,
+              "colSpan": 12,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceType",
+                  "value": "Microsoft.Resources/resources",
+                  "isOptional": true
+                },
+                {
+                  "name": "filter",
+                  "isOptional": true
+                },
+                {
+                  "name": "scope",
+                  "isOptional": true
+                },
+                {
+                  "name": "kind",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/BrowseAllResourcesPinnedPart"
+            }
+          },
+          "2": {
+            "position": {
+              "x": 14,
+              "y": 0,
+              "colSpan": 7,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## [SQL Vulnerabilites Workbook](https://portal.azure.com/#blade/AppInsightsExtension/UsageNotebookBlade/ComponentId/Azure%20Security%20Center/ConfigurationId/community-Workbooks%2FAzure%20Security%20Center%2FVulnerabilities/Type/workbook/WorkbookTemplateName/Vulnerability%20Assessment%20Findings)",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "3": {
+            "position": {
+              "x": 14,
+              "y": 1,
+              "colSpan": 7,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## [SQL Best Practices Assessment Workbook]({BpaWorkbookLink})",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "4": {
+            "position": {
+              "x": 0,
+              "y": 2,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n\t| where type =~ 'Microsoft.Sql/servers' or type == 'microsoft.azurearcdata/sqlserverinstances' or type == 'microsoft.sql/managedinstances'\r\n\t| extend propertiesState = tostring(properties.state)\r\n\t| extend propertiesStatus = tostring(properties.status)\r\n\t| extend version = tostring(properties.currentVersion )\r\n\t| extend patch = properties.patchlevel\r\n\t| extend vcore = tostring(properties.vCore)\r\n\t| extend license = tostring(properties.licenseType)\r\n\t| extend vcores = tostring(properties.vCores)\r\n\t| extend SQLversion = case( substring(version, 0, 2) == \"16\", \r\n\t\t\t\t\t\t\t\t\tcase(substring(properties.patchLevel,5,4) == \"4015\", \"SQL 2022 (CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4003\", \"SQL 2022 (CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1000\", \"SQL 2022 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tisempty(properties.patchlevel), \"\", \"Unknown\") ,\r\n\t\t\t\t\t\t\t\tsubstring(version, 0, 2) == \"15\", \r\n\t\t\t\t\t\t\t\t\tcase( substring(properties.patchLevel,5,4) == \"4298\", \"SQL 2019 (CU19)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4261\", \"SQL 2019 (CU18)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4249\", \"SQL 2019 (CU17)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4223\", \"SQL 2019 (CU16)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4198\", \"SQL 2019 (CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4188\", \"SQL 2019 (CU14)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4178\", \"SQL 2019 (CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4153\", \"SQL 2019 (CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4138\", \"SQL 2019 (CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4123\", \"SQL 2019 (CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4102\", \"SQL 2019 (CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4083\", \"SQL 2019 (CU8 w/SU)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4073\", \"SQL 2019 (CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4063\", \"SQL 2019 (CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4053\", \"SQL 2019 (CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4043\", \"SQL 2019 (CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4033\", \"SQL 2019 (CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4023\", \"SQL 2019 (CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4013\", \"SQL 2019 (CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4003\", \"SQL 2019 (CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2000\", \"SQL 2019 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tisempty(substring(properties.patchLevel,5,4)), \"\", \"Unknown\"),\r\n\t\t\t\t\t\t\t\tsubstring(version, 0, 2) == \"14\",\r\n\t\t\t\t\t\t\t\t\tcase( substring(properties.patchLevel,5,4) == \"3456\", \"SQL 2017 (CU31)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3451\", \"SQL 2017 (CU30)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3436\", \"SQL 2017 (CU29)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3430\", \"SQL 2017 (CU28)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3421\", \"SQL 2017 (CU27\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3411\", \"SQL 2017 (CU26)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3401\", \"SQL 2017 (CU25)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3391\", \"SQL 2017 (CU24)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3381\", \"SQL 2017 (CU23)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3356\", \"SQL 2017 (CU22)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3335\", \"SQL 2017 (CU21)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3294\", \"SQL 2017 (CU20)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3281\", \"SQL 2017 (CU19)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3257\", \"SQL 2017 (CU18)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3238\", \"SQL 2017 (CU17)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3223\", \"SQL 2017 (CU16)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3162\", \"SQL 2017 (CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3076\", \"SQL 2017 (CU14)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3048\", \"SQL 2017 (CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3045\", \"SQL 2017 (CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3038\", \"SQL 2017 (CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3037\", \"SQL 2017 (CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3030\", \"SQL 2017 (CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3029\", \"SQL 2017 (CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3026\", \"SQL 2017 (CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3025\", \"SQL 2017 (CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3023\", \"SQL 2017 (CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3022\", \"SQL 2017 (CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3015\", \"SQL 2017 (CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3008\", \"SQL 2017 (CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"3006\", \"SQL 2017 (CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1000\", \"SQL 2017 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tisempty(properties.patchLevel), \"\", \"Unknown\"),\r\n\t\t\t\t\t\t\t\tsubstring(version, 0, 2) == \"13\",\r\n\t\t\t\t\t\t\t\t\tcase( substring(properties.patchLevel,5,4) == \"7024\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"7016\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"7000\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6430\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6419\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6404\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6300\", \"SQL 2016 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5893\", \"SQL 2016 (SP2 CU17)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5888\", \"SQL 2016 (SP2 CU17)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5882\", \"SQL 2016 (SP2 CU16)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5865\", \"SQL 2016 (SP2 CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5850\", \"SQL 2016 (SP2 CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5830\", \"SQL 2016 (SP2 CU14)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5820\", \"SQL 2016 (SP2 CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5698\", \"SQL 2016 (SP2 CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5622\", \"SQL 2016 (SP2 CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5698\", \"SQL 2016 (SP2 CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5492\", \"SQL 2016 (SP2 CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5479\", \"SQL 2016 (SP2 CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5426\", \"SQL 2016 (SP2 CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5382\", \"SQL 2016 (SP2 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5366\", \"SQL 2016 (SP2 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5343\", \"SQL 2016 (SP2 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5337\", \"SQL 2016 (SP2 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5292\", \"SQL 2016 (SP2 CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5270\", \"SQL 2016 (SP2 CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5264\", \"SQL 2016 (SP2 CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5239\", \"SQL 2016 (SP2 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5233\", \"SQL 2016 (SP2 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5221\", \"SQL 2016 (SP2 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5216\", \"SQL 2016 (SP2 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5201\", \"SQL 2016 (SP2 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5161\", \"SQL 2016 (SP2 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5153\", \"SQL 2016 (SP2 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5149\", \"SQL 2016 (SP2 CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5108\", \"SQL 2016 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5103\", \"SQL 2016 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5102\", \"SQL 2016 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5101\", \"SQL 2016 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5081\", \"SQL 2016 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5026\", \"SQL 2016 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4604\", \"SQL 2016 (SP1 CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4577\", \"SQL 2016 (SP1 CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4574\", \"SQL 2016 (SP1 CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4560\", \"SQL 2016 (SP1 CU14)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4550\", \"SQL 2016 (SP1 CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4541\", \"SQL 2016 (SP1 CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4531\", \"SQL 2016 (SP1 CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4528\", \"SQL 2016 (SP1 CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4522\", \"SQL 2016 (SP1 CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4514\", \"SQL 2016 (SP1 CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4502\", \"SQL 2016 (SP1 CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4477\", \"SQL 2016 (SP1 CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4474\", \"SQL 2016 (SP1 CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4466\", \"SQL 2016 (SP1 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4457\", \"SQL 2016 (SP1 CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4451\", \"SQL 2016 (SP1 CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4446\", \"SQL 2016 (SP1 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4435\", \"SQL 2016 (SP1 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4422\", \"SQL 2016 (SP1 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4411\", \"SQL 2016 (SP1 CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4259\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4224\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4223\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4210\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4206\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4202\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4199\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4001\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2218\", \"SQL 2016 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2216\", \"SQL 2016 (SP1 CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2213\", \"SQL 2016 (SP1 CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2210\", \"SQL 2016 (SP1 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2204\", \"SQL 2016 (SP1 CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2197\", \"SQL 2016 (SP1 CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2193\", \"SQL 2016 (SP1 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2190\", \"SQL 2016 (SP1 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2186\", \"SQL 2016 (SP1 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2170\", \"SQL 2016 (SP1 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2169\", \"SQL 2016 (SP1 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2264\", \"SQL 2016 (SP1 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2149\", \"SQL 2016 (SP1 CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1745\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1742\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1728\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1722\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1711\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1708\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"1601\", \"SQL 2016 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tisempty(properties.patchLevel), \"\", \"Unknown\"),\r\n\t\t\t\t\t\t\t\tsubstring(version, 0, 2) == \"12\",\r\n\t\t\t\t\t\t\t\tcase( substring(properties.patchLevel,5,4) == \"6444\", \"SQL 2014 (SP3 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6439\", \"SQL 2014 (SP3 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6433\", \"SQL 2014 (SP3 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6372\", \"SQL 2014 (SP3 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6329\", \"SQL 2014 (SP3 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6259\", \"SQL 2014 (SP3 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6214\", \"SQL 2014 (SP3 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6205\", \"SQL 2014 (SP3 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6174\", \"SQL 2014 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6169\", \"SQL 2014 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6164\", \"SQL 2014 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6118\", \"SQL 2014 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6108\", \"SQL 2014 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"6024\", \"SQL 2014 (SP3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5687\", \"SQL 2014 (SP2 CU18)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5659\", \"SQL 2014 (SP2 CU17)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5632\", \"SQL 2014 (SP2 CU17)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5626\", \"SQL 2014 (SP2 CU16)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5605\", \"SQL 2014 (SP2 CU15)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5600\", \"SQL 2014 (SP2 CU14)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5590\", \"SQL 2014 (SP2 CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5589\", \"SQL 2014 (SP2 CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5579\", \"SQL 2014 (SP2 CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5571\", \"SQL 2014 (SP2 CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5563\", \"SQL 2014 (SP2 CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5557\", \"SQL 2014 (SP2 CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5556\", \"SQL 2014 (SP2 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5553\", \"SQL 2014 (SP2 CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5546\", \"SQL 2014 (SP2 CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5540\", \"SQL 2014 (SP2 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5538\", \"SQL 2014 (SP2 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5532\", \"SQL 2014 (SP2 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5522\", \"SQL 2014 (SP2 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5511\", \"SQL 2014 (SP2 CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5223\", \"SQL 2014 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5214\", \"SQL 2014 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5207\", \"SQL 2014 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5203\", \"SQL 2014 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"5000\", \"SQL 2014 (SP2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4522\", \"SQL 2014 (SP1 CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4522\", \"SQL 2014 (SP1 CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4511\", \"SQL 2014 (SP1 CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4502\", \"SQL 2014 (SP1 CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4491\", \"SQL 2014 (SP1 CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4487\", \"SQL 2014 (SP1 CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4474\", \"SQL 2014 (SP1 CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4468\", \"SQL 2014 (SP1 CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4463\", \"SQL 2014 (SP1 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4459\", \"SQL 2014 (SP1 CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4457\", \"SQL 2014 (SP1 CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4449\", \"SQL 2014 (SP1 CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4439\", \"SQL 2014 (SP1 CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4437\", \"SQL 2014 (SP1 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4436\", \"SQL 2014 (SP1 CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4433\", \"SQL 2014 (SP1 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4432\", \"SQL 2014 (SP1 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4427\", \"SQL 2014 (SP1 CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4422\", \"SQL 2014 (SP1 CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4419\", \"SQL 2014 (SP1 CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4416\", \"SQL 2014 (SP1 CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4219\", \"SQL 2014 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4213\", \"SQL 2014 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4100\", \"SQL 2014 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"4050\", \"SQL 2014 (SP1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2569\", \"SQL 2014 (RTM CU14)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2568\", \"SQL 2014 (RTM CU13)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2564\", \"SQL 2014 (RTM CU12)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2560\", \"SQL 2014 (RTM CU11)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2556\", \"SQL 2014 (RTM CU10)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2553\", \"SQL 2014 (RTM CU9)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2548\", \"SQL 2014 (RTM CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2546\", \"SQL 2014 (RTM CU8)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2506\", \"SQL 2014 (RTM CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2505\", \"SQL 2014 (RTM CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2504\", \"SQL 2014 (RTM CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2495\", \"SQL 2014 (RTM CU7)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2488\", \"SQL 2014 (RTM CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2485\", \"SQL 2014 (RTM CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2488\", \"SQL 2014 (RTM CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2485\", \"SQL 2014 (RTM CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2480\", \"SQL 2014 (RTM CU6)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2474\", \"SQL 2014 (RTM CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2472\", \"SQL 2014 (RTM CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2464\", \"SQL 2014 (RTM CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2456\", \"SQL 2014 (RTM CU5)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2436\", \"SQL 2014 (RTM CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2430\", \"SQL 2014 (RTM CU4)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2423\", \"SQL 2014 (RTM CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2405\", \"SQL 2014 (RTM CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2402\", \"SQL 2014 (RTM CU3)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2381\", \"SQL 2014 (RTM CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2370\", \"SQL 2014 (RTM CU2)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2342\", \"SQL 2014 (RTM CU1)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2271\", \"SQL 2014 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2269\", \"SQL 2014 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2254\", \"SQL 2014 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tsubstring(properties.patchLevel,5,4) == \"2000\", \"SQL 2014 (RTM)\",\r\n\t\t\t\t\t\t\t\t\tisempty(properties.patchLevel), \"\", \"Unknown\"),\r\n\t\t\t\t\t\t\t\tsubstring(version, 0, 2) == \"11\", \"SQL 2012\",\r\n\t\t\t\t\t\t\t\tsubstring(version, 0, 2) == \"11\", \"SQL 2008 R2\",\r\n\t\t\t\t\t\t\t\tisempty(propertiesState), \"\",    \"Unknown\")\r\n\t| extend edition = tostring(properties.edition)\t\r\n\t| extend state = case(    propertiesState == \"Degraded\", \"Degraded\",    \r\n\t\t\t\t\t\t\t  propertiesState == \"Warned\", \"Warned\",    \r\n\t\t\t\t\t\t\t  propertiesState == \"Disabled\", \"Disabled\",    \r\n\t\t\t\t\t\t\t  propertiesState == \"Ready\", \"Available\",    \r\n\t\t\t\t\t\t\t  propertiesState == \"Reserved\", \"Reserved\",  \r\n\t\t\t\t\t\t\t  propertiesStatus == \"Connected\", \"Connected\",  \r\n\t\t\t\t\t\t\t  isempty(propertiesState), \"\",    \"Unknown\")\r\n    | extend type = case(     ['type'] == \"microsoft.sql/servers\", \"Azure SQL\",\r\n                              ['type'] == \"microsoft.sql/managedinstances\", \"SQL MI\",\r\n                              ['type'] == \"microsoft.azurearcdata/sqlserverinstances\", \"Arc SQL\",\r\n                              isempty(['type']), \"\",    \"Unknown\")\r\n\t| extend Cores = case (   vcore != \"\", tostring(vcore), \r\n\t\t\t\t\t\t\t  vcores != \"\", tostring(vcores),\r\n\t\t\t\t\t\t\t  isempty(propertiesState), \"\",    \"N/A\")\r\n\t| project [\"Server\"] = name, [\"Type\"] = type, [\"Version\"] = SQLversion,  [\"Edition\"] = edition, [\"L-Type\"] = license, Cores //id, ",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "SQL Server Overview",
+                "subtitle": ""
+              }
+            }
+          },
+          "5": {
+            "position": {
+              "x": 7,
+              "y": 2,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "{BpaLogAnalyticsWorkspace}"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "05b384c2-aef6-4b0a-89a0-5d28d156bfe6",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "SqlAssessment_CL\n// Hard Code time to match how often you are running BPA assessments\n| where TimeGenerated >= ago(7d)\n// Raw Data is in CSV Format\n| extend parse_csv(RawData) \n| project\n    TimeGenerated,\n    RuleId = RawData[2],\n    FullRuleName = RawData[3],\n    Description = RawData[4],\n    RuleUrl = RawData[5],\n    // 1 = Server, 2 = Database\n    Scope = case(\n        toint(RawData[6]) == 1, \"Server\", \n        toint(RawData[6]) == 2, \"Database\", \n        \"None\"\n    ),\n    // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\n    Severity = case(\n        toint(RawData[8]) == 30, \"1 - High\", \n        toint(RawData[8]) == 20, \"2 - Medium\", \n        toint(RawData[8]) == 10, \"3 - Low\", \n        toint(RawData[8]) == -1, \"4 - Information\", \n        \"4 - Information\"\n    ),\n    // Split this and just have null in database for server level items\n    Server = tostring(split(RawData[7], \":\")[0]),\n    Database = tostring(split(RawData[7], \":\")[1]),\n    InstanceName = RawData[11],\n    SuggestedAction = RawData[9],\n    Tags = RawData[10]\n| where Severity != \"4 - Information\"\n| summarize count() by Server, Severity\n| sort by Server, Severity asc\n| render columnchart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "{BpaLogAnalyticsWorkspaceName}",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Severity",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Server",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "SqlAssessment_CL\n| where TimeGenerated >= ago(7d) // Hard Code time to match how often you are running BPA assessments\n| extend parse_csv(RawData) // Raw Data is in CSV Format\n| project\n    TimeGenerated,\n    RuleId = RawData[2],\n    FullRuleName = RawData[3],\n    Description = RawData[4],\n    RuleUrl = RawData[5],\n    // 1 = Server, 2 = Database\n    Scope = case(\n        toint(RawData[6]) == 1, \"Server\", \n        toint(RawData[6]) == 2, \"Database\", \n        \"None\"\n    ), // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\n        Severity = case(\n        toint(RawData[8]) == 30, \"1 - High\", \n        toint(RawData[8]) == 20, \"2 - Medium\", \n        toint(RawData[8]) == 10, \"3 - Low\", \n        toint(RawData[8]) == -1, \"4 - Information\", \n        \"4 - Information\"\n    ),\n    Server = tostring(split(RawData[7], \":\")[0]), // Split this and just have null in database for server level items\n    Database = tostring(split(RawData[7], \":\")[1]),\n    InstanceName = RawData[11],\n    SuggestedAction = RawData[9],\n    Tags = RawData[10]\n| where Severity != \"4 - Information\"\n| summarize Findings = count() by Server, Severity\n| sort by Server, Severity asc\n| render columnchart \n\n",
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Severity",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Server",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Findings",
+                        "type": "long"
+                      }
+                    ]
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "utc",
+                    "granularity": "auto",
+                    "relative": "7d"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "SQL Best Practices Analysis Summary",
+                "subtitle": ""
+              }
+            }
+          },
+          "6": {
+            "position": {
+              "x": 14,
+              "y": 2,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "securityresources\r\n| where type == \"microsoft.security/assessments/subassessments\"\r\n| extend assessmentKey = extract(\".*assessments/(.+?)/.*\",1,  id)\r\n| where assessmentKey == \"f97aa83c-9b63-4f9a-99f6-b22c4398f936\" or assessmentKey == \"82e20e14-edc5-4373-bfc4-f13121257c37\"\r\n | project id = tolower(extract(\"([\\\\s\\\\S]*?)(/providers/Microsoft.Security.*)\",1,id)), subscriptionId, severity = tostring(parse_json(properties).status.severity), status = tostring(parse_json(properties).status.code), VulnId = tostring(parse_json(properties).id)\r\n | where status == 'Unhealthy'\r\n | summarize count() by severity",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "SQL Vulnerabilities Found",
+                "subtitle": ""
+              }
+            }
+          },
+          "7": {
+            "position": {
+              "x": 0,
+              "y": 7,
+              "colSpan": 7,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "//Arc SQL Databases By vCore Count\nResources\n|where type contains(\"microsoft.azurearcdata/sqlserverinstances\")\n|extend vCores =properties.vCore\n// Switched to container resource id to prevent instances getting counted as cores\n| extend ServerName = split(properties.containerResourceId, \"/\")[-1]\n| extend InstanceName =properties.instanceName\n|where vCores <>\"\"\n|project ServerName,vCores,InstanceName\n|summarize count() by tostring(ServerName), toint(vCores)\n|order by toint(vCores)",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "vCoreCount by ServerName",
+                "subtitle": ""
+              }
+            }
+          },
+          "8": {
+            "position": {
+              "x": 7,
+              "y": 7,
+              "colSpan": 7,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Arc SQL Cores by Edition",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\" or type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\"\r\n| extend ServerName = tostring(coalesce(split(properties.virtualMachineResourceId, \"/\")[-1], split(properties.containerResourceId, \"/\")[-1]))\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| join kind = leftouter (\r\n    Resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(\"([0-9])+\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition))\r\n| distinct ServerName, vCores, SqlEdition\r\n| summarize sum(vCores) by SqlEdition",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "SQL Edition cores used on Arc and Azure VMs",
+                "subtitle": ""
+              }
+            }
+          },
+          "9": {
+            "position": {
+              "x": 14,
+              "y": 7,
+              "colSpan": 7,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "{PerformanceInsightsLogAnalyticsWorkspace}"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "016781f4-ac56-4717-84c3-7e4cd10a7007",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "InsightsMetrics\n|where TimeGenerated >=ago(12h)\n|where Name == \"UtilizationPercentage\"\n|project TimeGenerated, Val, Computer\n|render timechart\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "{PerformanceInsightsWorkspaceName}",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Computer",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "TimeGenerated",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Val",
+                        "type": "real"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Computer",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "TimeGenerated",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_Val",
+                        "type": "real"
+                      }
+                    ]
+                  },
+                  "IsQueryContainTimeRange": false,
+                  "PartTitle": "SQL Server CPU Usage",
+                  "Query": "let auto_bin_time = toscalar(InsightsMetrics\n| summarize MaxTime = max(TimeGenerated), MinTime = min(TimeGenerated)\n| extend TimeDiff = MaxTime - MinTime\n| project BinTime = case(\n    TimeDiff >= time(12h), timespan(5m),\n    TimeDiff >= time(2d), timespan(15m),\n    TimeDiff >= time(7d), timespan(30m),\n    TimeDiff >= time(30d), timespan(1h),\n    TimeDiff >= time(60d), timespan(6h),\n    TimeDiff >= time(120d), timespan(12h),\n    TimeDiff >= time(365d), timespan(24h),\n    timespan(1m)\n));\nInsightsMetrics\n| where Name == \"UtilizationPercentage\"\n| project TimeGenerated, Val, Computer\n| summarize avg(Val) by Computer, bin(TimeGenerated, auto_bin_time)\n| render timechart\n\n"
+                }
+              }
+            }
+          },
+          "10": {
+            "position": {
+              "x": 0,
+              "y": 13,
+              "colSpan": 14,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## [SQL Licensing Workbook]({SQLLicensingWorkbookLink})\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "11": {
+            "position": {
+              "x": 0,
+              "y": 14,
+              "colSpan": 14,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "filter",
+                  "isOptional": true
+                },
+                {
+                  "name": "resourceType",
+                  "value": "Microsoft.Sql/azuresql"
+                },
+                {
+                  "name": "kind",
+                  "isOptional": true
+                },
+                {
+                  "name": "view",
+                  "value": {
+                    "id": "4ce1fd2c-0e61-45f2-abcd-db3ca298c009",
+                    "name": "4ce1fd2c-0e61-45f2-abcd-db3ca298c009",
+                    "filter": "",
+                    "filterFacets": [
+                      {
+                        "key": "resourceGroup",
+                        "uniqueId": "4ce1fd2c-0e61-45f2-abcd-db3ca298c003",
+                        "display": "Resource group",
+                        "operator": 1,
+                        "isAllValues": true,
+                        "facetKind": 1
+                      },
+                      {
+                        "key": "locationDisplayName",
+                        "uniqueId": "4ce1fd2c-0e61-45f2-abcd-db3ca298c004",
+                        "display": "Location",
+                        "operator": 1,
+                        "isAllValues": true,
+                        "facetKind": 1
+                      }
+                    ],
+                    "groupByValue": "typeDisplayName",
+                    "sortedColumns": [
+                      {
+                        "sortBy": "name",
+                        "order": 1
+                      }
+                    ],
+                    "showAll": false,
+                    "gridColumns": [
+                      {
+                        "id": "resourceType",
+                        "visible": true,
+                        "name": "Resource type"
+                      },
+                      {
+                        "id": "serviceTier",
+                        "visible": true,
+                        "name": "Service tier"
+                      },
+                      {
+                        "id": "assetType",
+                        "visible": false,
+                        "name": "Type"
+                      },
+                      {
+                        "id": "kind",
+                        "visible": false,
+                        "name": "Kind"
+                      },
+                      {
+                        "id": "resourceGroupId",
+                        "visible": false,
+                        "name": "Resource group ID"
+                      },
+                      {
+                        "id": "locationId",
+                        "visible": false,
+                        "name": "Location ID"
+                      },
+                      {
+                        "id": "resourceId",
+                        "visible": false,
+                        "name": "Resource ID"
+                      },
+                      {
+                        "id": "subscriptionId",
+                        "visible": false,
+                        "name": "Subscription ID"
+                      },
+                      {
+                        "id": "tagsArray",
+                        "visible": false,
+                        "name": "Tags"
+                      },
+                      {
+                        "id": "serverName",
+                        "visible": false,
+                        "name": "Server"
+                      },
+                      {
+                        "id": "licenseType",
+                        "visible": false,
+                        "name": "License type"
+                      },
+                      {
+                        "id": "resourceGroup",
+                        "visible": false,
+                        "name": "Resource group"
+                      },
+                      {
+                        "id": "location",
+                        "visible": false,
+                        "name": "Location"
+                      },
+                      {
+                        "id": "subscription",
+                        "visible": false,
+                        "name": "Subscription"
+                      },
+                      {
+                        "id": "tags.defaultexperience",
+                        "visible": false,
+                        "name": "defaultExperience"
+                      },
+                      {
+                        "id": "tags.department",
+                        "visible": false,
+                        "name": "Department"
+                      },
+                      {
+                        "id": "tags.deployedby",
+                        "visible": false,
+                        "name": "deployedBY"
+                      },
+                      {
+                        "id": "tags.ms-resource-usage",
+                        "visible": false,
+                        "name": "ms-resource-usage"
+                      },
+                      {
+                        "id": "tags.project",
+                        "visible": false,
+                        "name": "project"
+                      },
+                      {
+                        "id": "tags.responsible",
+                        "visible": false,
+                        "name": "Responsible"
+                      },
+                      {
+                        "id": "tags.site",
+                        "visible": false,
+                        "name": "Site"
+                      }
+                    ],
+                    "gridColumnWidths": {
+                      "resourceType": "191px",
+                      "serviceTier": "219px"
+                    },
+                    "currentView": 1,
+                    "visualizationId": "location",
+                    "visualizationType": 4,
+                    "visualizationThreshold": 1
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/BrowseResourceTile",
+              "partHeader": {
+                "title": "SQL Environments by Resource Type"
+              }
+            }
+          }
+        }
+      }
+    },
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "auto",
+                "relative": "24h"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 24 hours"
+              },
+              "filteredPartIds": [
+                "StartboardPart-LogsDashboardPart-f168ea63-5514-47ed-ba93-3959265f5037",
+                "StartboardPart-LogsDashboardPart-f168ea63-5514-47ed-ba93-3959265f5043"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "Azure Arc Enabled SQL Server Demo Dashboard",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "Azure Arc Enabled SQL Server Demo Dashboard"
+  },
+  "apiVersion": "2015-08-01-preview"
+}
