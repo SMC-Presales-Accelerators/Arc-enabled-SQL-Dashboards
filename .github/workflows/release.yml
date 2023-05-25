@@ -27,7 +27,7 @@ jobs:
       # Fail build if any of the sub ids/local names are in the files
       - name: Prevent hard coded values in release
         run: |
-          $findcount=`grep -E '168a9a28-f769-4f1b-8038-4782329f7964|arc-la' */*.json | wc -l`
+          findcount=$(grep -E '168a9a28-f769-4f1b-8038-4782329f7964|arc-la' */*.json | wc -l)
           if [ $findcount -gt 0 ]
           then
             echo Found one of our hardcoded subscription ids or workspaces, please recheck the dashboard and workbook templates
