@@ -25,6 +25,11 @@ jobs:
       
       - name: Remove Queries from release
         run: rm -rf ./Queries/
+
+      - name: Remove git content from release
+        run: |
+          rm -rf ./.git/
+          rm -rf ./.github/
       
       # Fail build if any of the sub ids/local names are in the files
       - name: Prevent hard coded values in release
@@ -36,10 +41,11 @@ jobs:
             exit 1
           fi
           
-      # Runs a single command using the runners shell
-      - name: Zip our deployment
+      # Zip the deployment for distribution
+      - name: Zip deployment to arc-enabled-sql-dashboards.zip
         run: zip -r -q arc-enabled-sql-dashboards.zip .
       
+      # Add the deployment to the tag to make a release
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "arc-enabled-sql-dashboards.zip"
