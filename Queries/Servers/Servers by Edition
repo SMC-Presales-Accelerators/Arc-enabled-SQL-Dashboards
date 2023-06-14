@@ -1,5 +1,4 @@
-// If distinct count is small (e.g. < 1000)
-// run next query to get count of each value
+// Bar chart of SQL Server by Edition
 resources
 | where  ['type']  == "microsoft.azurearcdata/sqlserverinstances"
 | summarize Count=count() by tostring(properties['edition'])

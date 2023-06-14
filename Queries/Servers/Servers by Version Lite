@@ -1,3 +1,9 @@
+// SQL Server distribution by version
 resources
-| where type == "microsoft.azurearcdata/sqlserverinstances"
-| summarize Count=count() by tostring(properties['version'])
+| where type in (
+    "microsoft.sqlvirtualmachine/sqlvirtualmachine",  //Azure SQL virtual machine
+    "microsoft.azurearcdata/sqlserverinstances")      //Azure Arc-enabled SQL Server
+| extend version = properties.version
+| project name, version
+| summarize count() by tostring(version)
+| sort by ['version']
