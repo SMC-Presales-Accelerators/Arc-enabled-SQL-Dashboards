@@ -1,0 +1,14 @@
+resources
+| where type == "microsoft.hybridcompute/machines/extensions"
+| where name == "WindowsAgent.SqlServer"
+| extend status = properties.instanceView.status.message
+| extend AutomaticBackupsEnabled = iif(status contains "AutomaticBackups: Running;" and status !contains "SqlAgentPlugin: null,", true, false)
+// some magic strings to get the Sql Backup data out, really not the best way to do this, but I can't think of a better option at the moment, regex maybe?
+// actually even regex is still magic strings, but makes it a single operation instead of multiple splits
+| extend backupSettings = parse_json(extract("(SqlAgentPlugin: )(.*)(, )", 2, tostring(status)))
+| mv-expand backupSettings.profiles
+| where isnull(backupSettings_profiles) or backupSettings_profiles.enabled == true
+| extend retentionPeriodInDays = backupSettings_profiles.retentionPeriodInDays, fullBackupDays = backupSettings_profiles.fullBackupDays, differentialBackupHours = backupSettings_profiles.differentialBackupHours, tLogBackupMinutes = backupSettings_profiles.tLogBackupMinutes
+| extend arcId = split(id, "/extensions")[0]
+| project id = arcId, resourceGroup, location, AutomaticBackupsEnabled, retentionPeriodInDays, fullBackupDays, differentialBackupHours, tLogBackupMinutes
+| order by AutomaticBackupsEnabled desc 
