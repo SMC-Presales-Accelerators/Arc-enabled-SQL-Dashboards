@@ -8,99 +8,50 @@
             "position": {
               "x": 0,
               "y": 0,
-              "colSpan": 2,
-              "rowSpan": 2
+              "colSpan": 16,
+              "rowSpan": 1
             },
             "metadata": {
               "inputs": [],
-              "type": "Extension/HubsExtension/PartType/ClockPart",
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
               "settings": {
                 "content": {
-                  "timeFormat": "h:mma",
-                  "timezoneId": "Central Standard Time",
-                  "version": 1
+                  "content": "## General Information\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
                 }
               }
             }
           },
           "1": {
             "position": {
-              "x": 2,
+              "x": 16,
               "y": 0,
-              "colSpan": 12,
-              "rowSpan": 2
+              "colSpan": 5,
+              "rowSpan": 3
             },
             "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceType",
-                  "value": "Microsoft.Resources/resources",
-                  "isOptional": true
-                },
-                {
-                  "name": "filter",
-                  "isOptional": true
-                },
-                {
-                  "name": "scope",
-                  "isOptional": true
-                },
-                {
-                  "name": "kind",
-                  "isOptional": true
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "This dashboard was created as a series of dashboards to make Arc Enabled SQL Server more useful.\r\n\r\nIf you would like more information or to deploy these into your own environment you can go to [our Github](https://github.com/Onesuretng/Arc-enabled-SQL-Dashboards).\r\n\r\nIf you've already deployed this in your environment feel free to edit, contributed to the project, and most of all: delete this tile.",
+                  "title": "More Information",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
                 }
-              ],
-              "type": "Extension/HubsExtension/PartType/BrowseAllResourcesPinnedPart"
+              }
             }
           },
           "2": {
             "position": {
-              "x": 14,
-              "y": 0,
-              "colSpan": 7,
-              "rowSpan": 1
-            },
-            "metadata": {
-              "inputs": [],
-              "type": "Extension/HubsExtension/PartType/MarkdownPart",
-              "settings": {
-                "content": {
-                  "content": "## [SQL Vulnerabilites Workbook](https://portal.azure.com/#blade/AppInsightsExtension/UsageNotebookBlade/ComponentId/Azure%20Security%20Center/ConfigurationId/community-Workbooks%2FAzure%20Security%20Center%2FVulnerabilities/Type/workbook/WorkbookTemplateName/Vulnerability%20Assessment%20Findings)",
-                  "title": "",
-                  "subtitle": "",
-                  "markdownSource": 1,
-                  "markdownUri": ""
-                }
-              }
-            }
-          },
-          "3": {
-            "position": {
-              "x": 14,
+              "x": 0,
               "y": 1,
               "colSpan": 7,
-              "rowSpan": 1
-            },
-            "metadata": {
-              "inputs": [],
-              "type": "Extension/HubsExtension/PartType/MarkdownPart",
-              "settings": {
-                "content": {
-                  "content": "## [SQL Best Practices Assessment Workbook]({BpaWorkbookLink})",
-                  "title": "",
-                  "subtitle": "",
-                  "markdownSource": 1,
-                  "markdownUri": ""
-                }
-              }
-            }
-          },
-          "4": {
-            "position": {
-              "x": 0,
-              "y": 2,
-              "colSpan": 7,
-              "rowSpan": 5
+              "rowSpan": 4
             },
             "metadata": {
               "inputs": [
@@ -147,482 +98,12 @@
               }
             }
           },
-          "5": {
+          "3": {
             "position": {
               "x": 7,
-              "y": 2,
-              "colSpan": 7,
-              "rowSpan": 5
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "{BpaLogAnalyticsWorkspace}"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "05b384c2-aef6-4b0a-89a0-5d28d156bfe6",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "SqlAssessment_CL\n// Hard Code time to match how often you are running BPA assessments\n| where TimeGenerated >= ago(7d)\n// Raw Data is in CSV Format\n| extend parse_csv(RawData) \n| project\n    TimeGenerated,\n    RuleId = RawData[2],\n    FullRuleName = RawData[3],\n    Description = RawData[4],\n    RuleUrl = RawData[5],\n    // 1 = Server, 2 = Database\n    Scope = case(\n        toint(RawData[6]) == 1, \"Server\", \n        toint(RawData[6]) == 2, \"Database\", \n        \"None\"\n    ),\n    // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\n    Severity = case(\n        toint(RawData[8]) == 30, \"1 - High\", \n        toint(RawData[8]) == 20, \"2 - Medium\", \n        toint(RawData[8]) == 10, \"3 - Low\", \n        toint(RawData[8]) == -1, \"4 - Information\", \n        \"4 - Information\"\n    ),\n    // Split this and just have null in database for server level items\n    Server = tostring(split(RawData[7], \":\")[0]),\n    Database = tostring(split(RawData[7], \":\")[1]),\n    InstanceName = RawData[11],\n    SuggestedAction = RawData[9],\n    Tags = RawData[10]\n| where Severity != \"4 - Information\"\n| summarize count() by Server, Severity\n| sort by Server, Severity asc\n| render columnchart \n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "FrameControlChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "value": "StackedColumn",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "{BpaLogAnalyticsWorkspaceName}",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "value": {
-                    "aggregation": "Sum",
-                    "splitBy": [
-                      {
-                        "name": "Severity",
-                        "type": "string"
-                      }
-                    ],
-                    "xAxis": {
-                      "name": "Server",
-                      "type": "string"
-                    },
-                    "yAxis": [
-                      {
-                        "name": "count_",
-                        "type": "long"
-                      }
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "value": {
-                    "isEnabled": true,
-                    "position": "Bottom"
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": true,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {
-                "content": {
-                  "Query": "SqlAssessment_CL\n| where TimeGenerated >= ago(7d) // Hard Code time to match how often you are running BPA assessments\n| extend parse_csv(RawData) // Raw Data is in CSV Format\n| project\n    TimeGenerated,\n    RuleId = RawData[2],\n    FullRuleName = RawData[3],\n    Description = RawData[4],\n    RuleUrl = RawData[5],\n    // 1 = Server, 2 = Database\n    Scope = case(\n        toint(RawData[6]) == 1, \"Server\", \n        toint(RawData[6]) == 2, \"Database\", \n        \"None\"\n    ), // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\n        Severity = case(\n        toint(RawData[8]) == 30, \"1 - High\", \n        toint(RawData[8]) == 20, \"2 - Medium\", \n        toint(RawData[8]) == 10, \"3 - Low\", \n        toint(RawData[8]) == -1, \"4 - Information\", \n        \"4 - Information\"\n    ),\n    Server = tostring(split(RawData[7], \":\")[0]), // Split this and just have null in database for server level items\n    Database = tostring(split(RawData[7], \":\")[1]),\n    InstanceName = RawData[11],\n    SuggestedAction = RawData[9],\n    Tags = RawData[10]\n| where Severity != \"4 - Information\"\n| summarize Findings = count() by Server, Severity\n| sort by Server, Severity asc\n| render columnchart \n\n",
-                  "Dimensions": {
-                    "aggregation": "Sum",
-                    "splitBy": [
-                      {
-                        "name": "Severity",
-                        "type": "string"
-                      }
-                    ],
-                    "xAxis": {
-                      "name": "Server",
-                      "type": "string"
-                    },
-                    "yAxis": [
-                      {
-                        "name": "Findings",
-                        "type": "long"
-                      }
-                    ]
-                  }
-                }
-              },
-              "filters": {
-                "MsPortalFx_TimeRange": {
-                  "model": {
-                    "format": "utc",
-                    "granularity": "auto",
-                    "relative": "7d"
-                  }
-                }
-              },
-              "partHeader": {
-                "title": "SQL Best Practices Analysis Summary",
-                "subtitle": ""
-              }
-            }
-          },
-          "6": {
-            "position": {
-              "x": 14,
-              "y": 2,
-              "colSpan": 7,
-              "rowSpan": 5
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "partTitle",
-                  "value": "Query 1",
-                  "isOptional": true
-                },
-                {
-                  "name": "query",
-                  "value": "securityresources\r\n| where type == \"microsoft.security/assessments/subassessments\"\r\n| extend assessmentKey = extract(\".*assessments/(.+?)/.*\",1,  id)\r\n| where assessmentKey == \"f97aa83c-9b63-4f9a-99f6-b22c4398f936\" or assessmentKey == \"82e20e14-edc5-4373-bfc4-f13121257c37\"\r\n | project id = tolower(extract(\"([\\\\s\\\\S]*?)(/providers/Microsoft.Security.*)\",1,id)), subscriptionId, severity = tostring(parse_json(properties).status.severity), status = tostring(parse_json(properties).status.code), VulnId = tostring(parse_json(properties).id)\r\n | where status == 'Unhealthy'\r\n | summarize count() by severity",
-                  "isOptional": true
-                },
-                {
-                  "name": "chartType",
-                  "value": 2,
-                  "isOptional": true
-                },
-                {
-                  "name": "isShared",
-                  "isOptional": true
-                },
-                {
-                  "name": "queryId",
-                  "value": "",
-                  "isOptional": true
-                },
-                {
-                  "name": "formatResults",
-                  "isOptional": true
-                },
-                {
-                  "name": "queryScope",
-                  "value": {
-                    "scope": 0,
-                    "values": []
-                  },
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
-              "settings": {},
-              "partHeader": {
-                "title": "SQL Vulnerabilities Found",
-                "subtitle": ""
-              }
-            }
-          },
-          "7": {
-            "position": {
-              "x": 0,
-              "y": 7,
-              "colSpan": 7,
+              "y": 1,
+              "colSpan": 9,
               "rowSpan": 4
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "isShared",
-                  "isOptional": true
-                },
-                {
-                  "name": "queryId",
-                  "isOptional": true
-                },
-                {
-                  "name": "formatResults",
-                  "isOptional": true
-                },
-                {
-                  "name": "partTitle",
-                  "value": "Query 1",
-                  "isOptional": true
-                },
-                {
-                  "name": "chartType",
-                  "value": 1,
-                  "isOptional": true
-                },
-                {
-                  "name": "queryScope",
-                  "value": {
-                    "scope": 0,
-                    "values": []
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "query",
-                  "value": "//Arc SQL Databases By vCore Count\nResources\n|where type contains(\"microsoft.azurearcdata/sqlserverinstances\")\n|extend vCores =properties.vCore\n// Switched to container resource id to prevent instances getting counted as cores\n| extend ServerName = split(properties.containerResourceId, \"/\")[-1]\n| extend InstanceName =properties.instanceName\n|where vCores <>\"\"\n|project ServerName,vCores,InstanceName\n|summarize count() by tostring(ServerName), toint(vCores)\n|order by toint(vCores)",
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
-              "settings": {},
-              "partHeader": {
-                "title": "vCoreCount by ServerName",
-                "subtitle": ""
-              }
-            }
-          },
-          "8": {
-            "position": {
-              "x": 7,
-              "y": 7,
-              "colSpan": 7,
-              "rowSpan": 4
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "partTitle",
-                  "value": "Arc SQL Cores by Edition",
-                  "isOptional": true
-                },
-                {
-                  "name": "isShared",
-                  "isOptional": true
-                },
-                {
-                  "name": "formatResults",
-                  "isOptional": true
-                },
-                {
-                  "name": "queryScope",
-                  "value": {
-                    "scope": 0,
-                    "values": []
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "queryId",
-                  "isOptional": true
-                },
-                {
-                  "name": "query",
-                  "value": "Resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\" or type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\"\r\n| extend ServerName = tostring(coalesce(split(properties.virtualMachineResourceId, \"/\")[-1], split(properties.containerResourceId, \"/\")[-1]))\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| join kind = leftouter (\r\n    Resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(\"([0-9])+\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition))\r\n| distinct ServerName, vCores, SqlEdition\r\n| summarize sum(vCores) by SqlEdition",
-                  "isOptional": true
-                },
-                {
-                  "name": "chartType",
-                  "value": 1,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
-              "settings": {},
-              "partHeader": {
-                "title": "SQL Edition cores used on Arc and Azure VMs",
-                "subtitle": ""
-              }
-            }
-          },
-          "9": {
-            "position": {
-              "x": 14,
-              "y": 7,
-              "colSpan": 7,
-              "rowSpan": 4
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "{PerformanceInsightsLogAnalyticsWorkspace}"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "016781f4-ac56-4717-84c3-7e4cd10a7007",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "InsightsMetrics\n|where TimeGenerated >=ago(12h)\n|where Name == \"UtilizationPercentage\"\n|project TimeGenerated, Val, Computer\n|render timechart\n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "FrameControlChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "value": "Line",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "{PerformanceInsightsWorkspaceName}",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "value": {
-                    "aggregation": "Sum",
-                    "splitBy": [
-                      {
-                        "name": "Computer",
-                        "type": "string"
-                      }
-                    ],
-                    "xAxis": {
-                      "name": "TimeGenerated",
-                      "type": "datetime"
-                    },
-                    "yAxis": [
-                      {
-                        "name": "Val",
-                        "type": "real"
-                      }
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "value": {
-                    "isEnabled": true,
-                    "position": "Bottom"
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": true,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {
-                "content": {
-                  "Dimensions": {
-                    "aggregation": "Sum",
-                    "splitBy": [
-                      {
-                        "name": "Computer",
-                        "type": "string"
-                      }
-                    ],
-                    "xAxis": {
-                      "name": "TimeGenerated",
-                      "type": "datetime"
-                    },
-                    "yAxis": [
-                      {
-                        "name": "avg_Val",
-                        "type": "real"
-                      }
-                    ]
-                  },
-                  "IsQueryContainTimeRange": false,
-                  "PartTitle": "SQL Server CPU Usage",
-                  "Query": "let auto_bin_time = toscalar(InsightsMetrics\n| summarize MaxTime = max(TimeGenerated), MinTime = min(TimeGenerated)\n| extend TimeDiff = MaxTime - MinTime\n| project BinTime = case(\n    TimeDiff >= time(12h), timespan(5m),\n    TimeDiff >= time(2d), timespan(15m),\n    TimeDiff >= time(7d), timespan(30m),\n    TimeDiff >= time(30d), timespan(1h),\n    TimeDiff >= time(60d), timespan(6h),\n    TimeDiff >= time(120d), timespan(12h),\n    TimeDiff >= time(365d), timespan(24h),\n    timespan(1m)\n));\nInsightsMetrics\n| where Name == \"UtilizationPercentage\"\n| project TimeGenerated, Val, Computer\n| summarize avg(Val) by Computer, bin(TimeGenerated, auto_bin_time)\n| render timechart\n\n"
-                }
-              }
-            }
-          },
-          "10": {
-            "position": {
-              "x": 0,
-              "y": 13,
-              "colSpan": 14,
-              "rowSpan": 1
-            },
-            "metadata": {
-              "inputs": [],
-              "type": "Extension/HubsExtension/PartType/MarkdownPart",
-              "settings": {
-                "content": {
-                  "content": "## [SQL Licensing Workbook]({SQLLicensingWorkbookLink})\n",
-                  "title": "",
-                  "subtitle": "",
-                  "markdownSource": 1,
-                  "markdownUri": ""
-                }
-              }
-            }
-          },
-          "11": {
-            "position": {
-              "x": 0,
-              "y": 14,
-              "colSpan": 14,
-              "rowSpan": 5
             },
             "metadata": {
               "inputs": [
@@ -794,6 +275,676 @@
                 "title": "SQL Environments by Resource Type"
               }
             }
+          },
+          "4": {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "colSpan": 16,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## Best Practices Assessment",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "5": {
+            "position": {
+              "x": 0,
+              "y": 6,
+              "colSpan": 9,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "{BpaLogAnalyticsWorkspace}"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "05b384c2-aef6-4b0a-89a0-5d28d156bfe6",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "SqlAssessment_CL\n// Hard Code time to match how often you are running BPA assessments\n| where TimeGenerated >= ago(7d)\n// Raw Data is in CSV Format\n| extend parse_csv(RawData) \n| project\n    TimeGenerated,\n    RuleId = RawData[2],\n    FullRuleName = RawData[3],\n    Description = RawData[4],\n    RuleUrl = RawData[5],\n    // 1 = Server, 2 = Database\n    Scope = case(\n        toint(RawData[6]) == 1, \"Server\", \n        toint(RawData[6]) == 2, \"Database\", \n        \"None\"\n    ),\n    // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\n    Severity = case(\n        toint(RawData[8]) == 30, \"1 - High\", \n        toint(RawData[8]) == 20, \"2 - Medium\", \n        toint(RawData[8]) == 10, \"3 - Low\", \n        toint(RawData[8]) == -1, \"4 - Information\", \n        \"4 - Information\"\n    ),\n    // Split this and just have null in database for server level items\n    Server = tostring(split(RawData[7], \":\")[0]),\n    Database = tostring(split(RawData[7], \":\")[1]),\n    InstanceName = RawData[11],\n    SuggestedAction = RawData[9],\n    Tags = RawData[10]\n| where Severity != \"4 - Information\"\n| summarize count() by Server, Severity\n| sort by Server, Severity asc\n| render columnchart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "{BpaLogAnalyticsWorkspaceName}",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Severity",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Server",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "long"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "SqlAssessment_CL\n| where TimeGenerated >= ago(7d) // Hard Code time to match how often you are running BPA assessments\n| extend parse_csv(RawData) // Raw Data is in CSV Format\n| project\n    TimeGenerated,\n    RuleId = RawData[2],\n    FullRuleName = RawData[3],\n    Description = RawData[4],\n    RuleUrl = RawData[5],\n    // 1 = Server, 2 = Database\n    Scope = case(\n        toint(RawData[6]) == 1, \"Server\", \n        toint(RawData[6]) == 2, \"Database\", \n        \"None\"\n    ), // 30 = High Sev, 20 = Medium, 10 = Low, 0 = Info, -1 = Ignore\n        Severity = case(\n        toint(RawData[8]) == 30, \"1 - High\", \n        toint(RawData[8]) == 20, \"2 - Medium\", \n        toint(RawData[8]) == 10, \"3 - Low\", \n        toint(RawData[8]) == -1, \"4 - Information\", \n        \"4 - Information\"\n    ),\n    Server = tostring(split(RawData[7], \":\")[0]), // Split this and just have null in database for server level items\n    Database = tostring(split(RawData[7], \":\")[1]),\n    InstanceName = RawData[11],\n    SuggestedAction = RawData[9],\n    Tags = RawData[10]\n| where Severity != \"4 - Information\"\n| summarize Findings = count() by Server, Severity\n| sort by Server, Severity asc\n| render columnchart \n\n",
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Severity",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "Server",
+                      "type": "string"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Findings",
+                        "type": "long"
+                      }
+                    ]
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "utc",
+                    "granularity": "auto",
+                    "relative": "7d"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "SQL Best Practices Analysis Summary",
+                "subtitle": ""
+              }
+            }
+          },
+          "6": {
+            "position": {
+              "x": 9,
+              "y": 6,
+              "colSpan": 7,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## [SQL Best Practices Assessment Workbook]({BpaWorkbookLink})",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "7": {
+            "position": {
+              "x": 0,
+              "y": 11,
+              "colSpan": 16,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## Licensing",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "8": {
+            "position": {
+              "x": 0,
+              "y": 12,
+              "colSpan": 8,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "//Arc SQL Databases By vCore Count\nResources\n|where type contains(\"microsoft.azurearcdata/sqlserverinstances\")\n|extend vCores =properties.vCore\n// Switched to container resource id to prevent instances getting counted as cores\n| extend ServerName = split(properties.containerResourceId, \"/\")[-1]\n| extend InstanceName =properties.instanceName\n|where vCores <>\"\"\n|project ServerName,vCores,InstanceName\n|summarize count() by tostring(ServerName), toint(vCores)\n|order by toint(vCores)",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "vCoreCount by ServerName",
+                "subtitle": ""
+              }
+            }
+          },
+          "9": {
+            "position": {
+              "x": 8,
+              "y": 12,
+              "colSpan": 8,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Arc SQL Cores by Edition",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\" or type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\"\r\n| extend ServerName = tostring(coalesce(split(properties.virtualMachineResourceId, \"/\")[-1], split(properties.containerResourceId, \"/\")[-1]))\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| join kind = leftouter (\r\n    Resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(\"([0-9])+\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition))\r\n| distinct ServerName, vCores, SqlEdition\r\n| summarize sum(vCores) by SqlEdition",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 1,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "SQL Edition cores used on Arc and Azure VMs",
+                "subtitle": ""
+              }
+            }
+          },
+          "10": {
+            "position": {
+              "x": 0,
+              "y": 16,
+              "colSpan": 16,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## [SQL Licensing Workbook]({SQLLicensingWorkbookLink})\n",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "11": {
+            "position": {
+              "x": 0,
+              "y": 17,
+              "colSpan": 16,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## Performance",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "12": {
+            "position": {
+              "x": 0,
+              "y": 18,
+              "colSpan": 16,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "{PerformanceInsightsLogAnalyticsWorkspace}"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "016781f4-ac56-4717-84c3-7e4cd10a7007",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "InsightsMetrics\n|where TimeGenerated >=ago(12h)\n|where Name == \"UtilizationPercentage\"\n|project TimeGenerated, Val, Computer\n|render timechart\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "{PerformanceInsightsWorkspaceName}",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Computer",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "TimeGenerated",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Val",
+                        "type": "real"
+                      }
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Dimensions": {
+                    "aggregation": "Sum",
+                    "splitBy": [
+                      {
+                        "name": "Computer",
+                        "type": "string"
+                      }
+                    ],
+                    "xAxis": {
+                      "name": "TimeGenerated",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_Val",
+                        "type": "real"
+                      }
+                    ]
+                  },
+                  "IsQueryContainTimeRange": false,
+                  "PartTitle": "SQL Server CPU Usage",
+                  "Query": "let auto_bin_time = toscalar(InsightsMetrics\n| summarize MaxTime = max(TimeGenerated), MinTime = min(TimeGenerated)\n| extend TimeDiff = MaxTime - MinTime\n| project BinTime = case(\n    TimeDiff >= time(12h), timespan(5m),\n    TimeDiff >= time(2d), timespan(15m),\n    TimeDiff >= time(7d), timespan(30m),\n    TimeDiff >= time(30d), timespan(1h),\n    TimeDiff >= time(60d), timespan(6h),\n    TimeDiff >= time(120d), timespan(12h),\n    TimeDiff >= time(365d), timespan(24h),\n    timespan(1m)\n));\nInsightsMetrics\n| where Name == \"UtilizationPercentage\"\n| project TimeGenerated, Val, Computer\n| summarize avg(Val) by Computer, bin(TimeGenerated, auto_bin_time)\n| render timechart\n\n"
+                }
+              }
+            }
+          },
+          "13": {
+            "position": {
+              "x": 0,
+              "y": 22,
+              "colSpan": 16,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## Security",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "14": {
+            "position": {
+              "x": 0,
+              "y": 23,
+              "colSpan": 10,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "securityresources\r\n| where type == \"microsoft.security/assessments/subassessments\"\r\n| extend assessmentKey = extract(\".*assessments/(.+?)/.*\",1,  id)\r\n| where assessmentKey == \"f97aa83c-9b63-4f9a-99f6-b22c4398f936\" or assessmentKey == \"82e20e14-edc5-4373-bfc4-f13121257c37\"\r\n | project id = tolower(extract(\"([\\\\s\\\\S]*?)(/providers/Microsoft.Security.*)\",1,id)), subscriptionId, severity = tostring(parse_json(properties).status.severity), status = tostring(parse_json(properties).status.code), VulnId = tostring(parse_json(properties).id)\r\n | where status == 'Unhealthy'\r\n | summarize count() by severity",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "SQL Vulnerabilities Found",
+                "subtitle": ""
+              }
+            }
+          },
+          "15": {
+            "position": {
+              "x": 10,
+              "y": 23,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## [SQL Vulnerabilites Workbook](https://portal.azure.com/#blade/AppInsightsExtension/UsageNotebookBlade/ComponentId/Azure%20Security%20Center/ConfigurationId/community-Workbooks%2FAzure%20Security%20Center%2FVulnerabilities/Type/workbook/WorkbookTemplateName/Vulnerability%20Assessment%20Findings)",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "16": {
+            "position": {
+              "x": 0,
+              "y": 27,
+              "colSpan": 16,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "## Automatic Backups",
+                  "title": "",
+                  "subtitle": "",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          "17": {
+            "position": {
+              "x": 0,
+              "y": 28,
+              "colSpan": 16,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "value": true,
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "resources\r\n| where type == \"microsoft.hybridcompute/machines/extensions\"\r\n| where name == \"WindowsAgent.SqlServer\"\r\n| extend status = properties.instanceView.status.message\r\n| extend AutomaticBackupsEnabled = iif(status contains \"AutomaticBackups: Running;\" and status !contains \"SqlAgentPlugin: null,\", true, false)\r\n// some magic strings to get the Sql Backup data out, really not the best way to do this, but I can't think of a better option at the moment, regex maybe?\r\n// actually even regex is still magic strings, but makes it a single operation instead of multiple splits\r\n| extend backupSettings = parse_json(extract(\"(SqlAgentPlugin: )(.*)(, )\", 2, tostring(status)))\r\n| mv-expand backupSettings.profiles\r\n| where isnull(backupSettings_profiles) or backupSettings_profiles.enabled == true\r\n| extend retentionPeriodInDays = backupSettings_profiles.retentionPeriodInDays, fullBackupDays = backupSettings_profiles.fullBackupDays, differentialBackupHours = backupSettings_profiles.differentialBackupHours, tLogBackupMinutes = backupSettings_profiles.tLogBackupMinutes\r\n| extend arcId = split(id, \"/extensions\")[0]\r\n| project id = arcId, resourceGroup, location, AutomaticBackupsEnabled, retentionPeriodInDays, fullBackupDays, differentialBackupHours, tLogBackupMinutes\r\n| order by AutomaticBackupsEnabled desc ",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Automatic Backup Settings",
+                "subtitle": ""
+              }
+            }
           }
         }
       }
@@ -825,8 +976,8 @@
                 "value": "Past 24 hours"
               },
               "filteredPartIds": [
-                "StartboardPart-LogsDashboardPart-f168ea63-5514-47ed-ba93-3959265f5037",
-                "StartboardPart-LogsDashboardPart-f168ea63-5514-47ed-ba93-3959265f5043"
+                "StartboardPart-LogsDashboardPart-f9066774-30e0-4c37-9a76-df5ae4931077",
+                "StartboardPart-LogsDashboardPart-f9066774-30e0-4c37-9a76-df5ae493107f"
               ]
             }
           }
