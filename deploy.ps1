@@ -195,9 +195,14 @@ function DeployResources {
     $json = Get-Content -Path '.\Workbooks\SQL Licensing Summary.json' -Raw
     $LicensingWorkbookId = DeployWorkbook -WorkbookDisplayName "SQL Licensing Summary" -WorkbookJson $json -ResourceGroup $ResourceGroup
 
-    $json = Get-Content -Path '.\Workbooks\SQL Best Practice Assessment Workbook.json' -Raw
-    $json = $json.Replace("{BpaLogAnalyticsWorkspace}", $BpaWorkspace.ResourceId)
-    $BpaWorkbookId = DeployWorkbook -WorkbookDisplayName "SQL Best Practice Assessment Workbook" -WorkbookJson $json -ResourceGroup $ResourceGroup
+    $BpaWorkbookLink = ""
+    if($null -ne $BpaWorkspace) {
+        $json = Get-Content -Path '.\Workbooks\SQL Best Practice Assessment Workbook.json' -Raw
+        $json = $json.Replace("{BpaLogAnalyticsWorkspace}", $BpaWorkspace.ResourceId)
+        $BpaWorkbookId = DeployWorkbook -WorkbookDisplayName "SQL Best Practice Assessment Workbook" -WorkbookJson $json -ResourceGroup $ResourceGroup
+        $BpaWorkbookLink = CreateWorkbookLink -WorkbookId $BpaWorkbookId.Value -ResourceGroup $ResourceGroup
+    }
+    
 
     # We need the RG Location to be able to create the Dashboard Deployment
     $RgLocation = $(Get-AzResourceGroup -Name $ResourceGroup).Location
@@ -212,18 +217,33 @@ function DeployResources {
     }
 
     #To properly link to the Workbooks created above, we need to build the links based on the resource id
-    $BpaWorkbookLink = CreateWorkbookLink -WorkbookId $BpaWorkbookId.Value -ResourceGroup $ResourceGroup
     $LicensingWorkbookLink = CreateWorkbookLink -WorkbookId $LicensingWorkbookId.Value -ResourceGroup $ResourceGroup
 
     $json = Get-Content -Path '.\Dashboards\Azure Arc Enabled SQL Server Demo Dashboard.json' -Raw
     $json = $json.Replace("INSERT LOCATION", $RgLocation)
-    $json = $json.Replace("{BpaWorkbookLink}", $BpaWorkbookLink)
-    $json = $json.Replace("{BpaLogAnalyticsWorkspace}", $BpaWorkspace.ResourceId)
-    $json = $json.Replace("{BpaLogAnalyticsWorkspaceName}", $BpaWorkspace.Name)
-    $json = $json.Replace("{PerformanceInsightsLogAnalyticsWorkspace}", $PerformanceInsightsWorkspace.ResourceId)
-    $json = $json.Replace("{PerformanceInsightsWorkspaceName}", $PerformanceInsightsWorkspace.Name)
+    if($null -ne $BpaWorkspace) {
+        $json = $json.Replace("{BpaWorkbookLink}", $BpaWorkbookLink)
+        $json = $json.Replace("{BpaLogAnalyticsWorkspace}", $BpaWorkspace.ResourceId)
+        $json = $json.Replace("{BpaLogAnalyticsWorkspaceName}", $BpaWorkspace.Name)
+    }
+    if($null -ne $PerformanceInsightsWorkspace) {
+        $json = $json.Replace("{PerformanceInsightsLogAnalyticsWorkspace}", $PerformanceInsightsWorkspace.ResourceId)
+        $json = $json.Replace("{PerformanceInsightsWorkspaceName}", $PerformanceInsightsWorkspace.Name)
+    }
     $json = $json.Replace("{SQLLicensingWorkbookLink}", $LicensingWorkbookLink)
+    $ManipulateDashboardJson = ConvertFrom-Json $json
+    if($null -eq $BpaWorkspace) {
+        $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("4")
+        $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("5")
+        $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("6")
+    }
+    if($null -eq $PerformanceInsightsWorkspace) {
+        $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("11")
+        $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("12")
+    }
+
     $ArcSqlDashboardId = New-Guid
+    $json = Convert-ToJson $ManipulateDashboardJson
     $json | Out-File -Path "$ArcSqlDashboardId.json"
     $ArcSqlDashboardResult = New-AzPortalDashboard -DashboardPath "$ArcSqlDashboardId.json" -Name $ArcSqlDashboardId -ResourceGroupName $ResourceGroup
     if($ArcSqlDashboardResult) {
@@ -290,6 +310,7 @@ $valid = BoolValidation -UserInput $RgResponse
 while(!($valid.Result)) {
     Write-Host $valid.Message -ForegroundColor Yellow
     $RgResponse = Read-Host $InputMessage
+    $valid = BoolValidation -UserInput $RgResponse
 }
 
 if($valid.Result) {
@@ -344,8 +365,23 @@ if($BpaWorkspaces.Count -eq 1) {
     }
     $SelectedBpaWorkspace = $BpaWorkspaces[$WsSelection-1]
 } elseif($BpaWorkspaces.Count -eq 0) {
-    Write-Error "You do not have SQL Best Practices Assessment configured for your subscription, please enable for at least one device and try again."
-    exit
+    $InputMessage = "You do not have SQL Best Practices Assessment configured, Would you like to remove that section of the Dashboard (y/n)?"
+    $BpaResponse = Read-Host $InputMessage
+    $valid = BoolValidation -UserInput $BpaResponse
+    while(!($valid.Result)) {
+        Write-Host $valid.Message -ForegroundColor Yellow
+        $BpaResponse = Read-Host $InputMessage
+        $valid = BoolValidation -UserInput $BpaResponse
+    }
+
+    if($valid.Result) {
+        if($valid.Response) {
+            $SelectedBpaWorkspace = $null;
+        } else {
+            Write-Error "We will not be able to continue without a BPA Workspace if you would like the dashboard section to remain, exiting."
+            exit
+        }
+    }
 } 
 
 Clear-Host
@@ -377,8 +413,23 @@ if($PerformanceInsights.Count -eq 1) {
     }
     $SelectedPerformanceInsightsWorkspace = $PerformanceInsights[$WsSelection-1]
 } elseif($PerformanceInsights.Count -eq 0) {
-    Write-Error "You do not have Performance Insights configured for your subscription, please enable for at least one device and try again."
-    exit
+    $InputMessage = "You do not have Performance Insights configured, Would you like to remove that section of the Dashboard (y/n)?"
+    $PiResponse = Read-Host $InputMessage
+    $valid = BoolValidation -UserInput $PiResponse
+    while(!($valid.Result)) {
+        Write-Host $valid.Message -ForegroundColor Yellow
+        $PiResponse = Read-Host $InputMessage
+        $valid = BoolValidation -UserInput $PiResponse
+    }
+
+    if($valid.Result) {
+        if($valid.Response) {
+            $SelectedPerformanceInsightsWorkspace = $null;
+        } else {
+            Write-Error "We will not be able to continue without Performance Insights configured if you would like the dashboard section to remain, exiting."
+            exit
+        }
+    }
 } 
 
 #Printing template based upon responses and confirming whether to proceed
@@ -386,10 +437,14 @@ Clear-Host
 
 Write-Host "`r`nWe will be deploying the dashboards and workbooks to the Resource Group  " -NoNewLine
 Write-Host $SelectedRg -ForegroundColor Cyan 
-Write-Host "For BPA we will query the information from " -NoNewLine 
-Write-Host $SelectedBpaWorkspace.Name -ForegroundColor Cyan 
-Write-Host "For Performance Metrics we will query the information from " -NoNewLine 
-Write-Host $SelectedPerformanceInsightsWorkspace.Name -ForegroundColor Cyan 
+if($null -ne $SelectedBpaWorkspace) {
+    Write-Host "For BPA we will query the information from " -NoNewLine 
+    Write-Host $SelectedBpaWorkspace.Name -ForegroundColor Cyan 
+}
+if($null -ne $SelectedPerformanceInsightsWorkspace) {
+    Write-Host "For Performance Metrics we will query the information from " -NoNewLine 
+    Write-Host $SelectedPerformanceInsightsWorkspace.Name -ForegroundColor Cyan 
+}
 
 $confirmation = ProceedValidation
 
