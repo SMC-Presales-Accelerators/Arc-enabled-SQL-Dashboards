@@ -243,7 +243,7 @@ function DeployResources {
     }
 
     $ArcSqlDashboardId = New-Guid
-    $json = Convert-ToJson $ManipulateDashboardJson
+    $json = ConvertTo-Json $ManipulateDashboardJson -Compress
     $json | Out-File -Path "$ArcSqlDashboardId.json"
     $ArcSqlDashboardResult = New-AzPortalDashboard -DashboardPath "$ArcSqlDashboardId.json" -Name $ArcSqlDashboardId -ResourceGroupName $ResourceGroup
     if($ArcSqlDashboardResult) {
