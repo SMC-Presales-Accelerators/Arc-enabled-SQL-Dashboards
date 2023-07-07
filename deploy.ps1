@@ -1,9 +1,9 @@
 <#
 .Synopsis
-DPi30 Decision and Deployment Tree
+Arc SQL Dashboards and Workbooks Deployment Script
 
 .Description
-Script that will walk you through determining the proper DPi30 Template and help you deploy it step by step.
+Automated method to add the Arc SQL workbooks and dashboards to your subscription via Azure Powershell.
 #>
 
 #Validate yes or no question input
