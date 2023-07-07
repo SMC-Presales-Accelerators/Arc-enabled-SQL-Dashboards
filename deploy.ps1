@@ -272,7 +272,7 @@ if (Get-Module -ListAvailable -Name Az.ConnectedMachine) {
 } 
 else {
     try {
-        Install-Module -Name Az.ConnectedMachine -AllowClobber -Confirm:$False -Force  
+        Install-Module -Name Az.ConnectedMachine -Confirm:$False -Force  
     }
     catch [Exception] {
         $_.message 
@@ -286,7 +286,7 @@ if (Get-Module -ListAvailable -Name Az.Portal) {
 } 
 else {
     try {
-        Install-Module -Name Az.Portal -AllowClobber -Confirm:$False -Force  
+        Install-Module -Name Az.Portal -Confirm:$False -Force  
     }
     catch [Exception] {
         $_.message 
