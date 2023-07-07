@@ -45,7 +45,7 @@ function IntValidation {
 
 #Validating the input of a yes no for continuing with deployment, more specific than a normal boolean situation.
 function ProceedValidation {
-    $InputMessage = "`r`nWould you like to continue? "
+    $InputMessage = "`r`nWould you like to continue? (y/n):"
     Write-Host $InputMessage -NoNewLine
     $confirmation = Read-Host
     $valid = BoolValidation -UserInput $confirmation
@@ -243,7 +243,7 @@ function DeployResources {
     }
 
     $ArcSqlDashboardId = New-Guid
-    $json = ConvertTo-Json $ManipulateDashboardJson -Compress
+    $json = ConvertTo-Json $ManipulateDashboardJson -Compress -Depth 20
     $json | Out-File -Path "$ArcSqlDashboardId.json"
     $ArcSqlDashboardResult = New-AzPortalDashboard -DashboardPath "$ArcSqlDashboardId.json" -Name $ArcSqlDashboardId -ResourceGroupName $ResourceGroup
     if($ArcSqlDashboardResult) {
@@ -344,7 +344,7 @@ if($valid.Result) {
     } else {
         $RgOutput = $null
         while(!($RgOutput)) {
-            $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist)"
+            $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist):"
             $RgOutput = Get-AzResourceGroup -Name $SelectedRg 2>$null
             if(!($RgOutput)) {
                 Write-Warning "Resource Group $SelectedRg does not exist in this subscription."
@@ -460,7 +460,7 @@ if($PerformanceInsights.Count -eq 1) {
 #Printing template based upon responses and confirming whether to proceed
 Clear-Host
 
-Write-Host "`r`nWe will be deploying the dashboards and workbooks to the Resource Group  " -NoNewLine
+Write-Host "`r`nWe will be deploying the dashboards and workbooks to the Resource Group " -NoNewLine
 Write-Host $SelectedRg -ForegroundColor Cyan 
 if($null -ne $SelectedBpaWorkspace) {
     Write-Host "For BPA we will query the information from " -NoNewLine 
