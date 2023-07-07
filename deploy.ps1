@@ -236,10 +236,22 @@ function DeployResources {
         $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("4")
         $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("5")
         $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("6")
+        # Move all cells up by 6 since we are removing these
+        foreach($x in 7..17)
+        {
+            [string]$s = $x
+            $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.properties[$s].value.position.y -= 6
+        }
     }
     if($null -eq $PerformanceInsightsWorkspace) {
         $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("11")
         $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.Properties.Remove("12")
+        # Move all cells up by 5 since we are removing these
+        foreach($x in 13..17)
+        {
+            [string]$s = $x
+            $ManipulateDashboardJson.properties.lenses."0".parts.PSObject.properties[$s].value.position.y -= 5
+        }
     }
 
     $ArcSqlDashboardId = New-Guid
@@ -324,6 +336,7 @@ Start-Sleep -s 2 #Quick sleep before a new section and clear host
 
 # Show them the RG with the most Arc resources and ask if they want to deploy the daskboards there
 # Otherwise, ask for an RG name
+
 $MostUsedArcRG = (Get-AzConnectedMachine | Group-Object ResourceGroupName | Sort-Object -Descending Count | Select-Object Name, Count)[0].Name
 $SelectedRg = ""
 
@@ -344,7 +357,7 @@ if($valid.Result) {
     } else {
         $RgOutput = $null
         while(!($RgOutput)) {
-            $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist):"
+            $SelectedRg = Read-Host "Please enter your Resource Group (it must already exist)"
             $RgOutput = Get-AzResourceGroup -Name $SelectedRg 2>$null
             if(!($RgOutput)) {
                 Write-Warning "Resource Group $SelectedRg does not exist in this subscription."
