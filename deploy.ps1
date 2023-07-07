@@ -255,7 +255,32 @@ function DeployResources {
 }
 
 #Install Az-ConnectedMachine to allow for Extension Data Gathering
-Install-Module -Name Az.ConnectedMachine
+if (Get-Module -ListAvailable -Name Az.ConnectedMachine) {
+    Write-Host "Az.ConnectedMachine Already Installed, update if needed manually."
+} 
+else {
+    try {
+        Install-Module -Name Az.ConnectedMachine -AllowClobber -Confirm:$False -Force  
+    }
+    catch [Exception] {
+        $_.message 
+        exit
+    }
+}
+
+#Install Az.Portal to allow for Adding Dashboards
+if (Get-Module -ListAvailable -Name Az.Portal) {
+    Write-Host "Az.Portal Already Installed, update if needed manually."
+} 
+else {
+    try {
+        Install-Module -Name Az.Portal -AllowClobber -Confirm:$False -Force  
+    }
+    catch [Exception] {
+        $_.message 
+        exit
+    }
+}
 
 # Our code entry point, We verify the subscription and move through the steps from here.
 Clear-Host
