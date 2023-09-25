@@ -1,6 +1,8 @@
 # Arc-enabled-SQL-Dashboards
 This repository contains queries and workbooks to build out an Azure Dashboard to view Arc-enabled SQL Servers.
 
+The easiest way to use them all as a group is to install via the PowerShell script. Items can be used individually if needed, but often can take more effort to add.
+
 ## Deployment
 1. Launch Azure Cloud Shell ([Quickstart for Azure Cloud Shell](https://learn.microsoft.com/en-us/azure/cloud-shell/quickstart?tabs=azurecli))
 2. Run `wget https://github.com/Onesuretng/Arc-enabled-SQL-Dashboards/releases/latest/download/arc-enabled-sql-dashboards.zip` to download the most recent release
