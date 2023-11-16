@@ -4,5 +4,6 @@ This repository contains queries and workbooks to build out an Azure Dashboard t
 ## Deployment
 Click the button below to deploy to your Azure Subscription:
 
+[![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FOnesuretng%2FArc-enabled-SQL-Dashboards%2Fworkbook%2Fdeploy.json)
 
 ![Azure Arc Enabled SQL Server Demo Dashboard Example](images/dashboard.png)

@@ -7,12 +7,32 @@
       {
         "type": "Microsoft.Resources/deployments",
         "apiVersion": "2022-09-01",
-        "name": "linkedTemplate",
+        "name": "sqlLicensingWorkbook",
         "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri":"https://mystorageaccount.blob.core.windows.net/AzureTemplates/newStorageAccount.json",
+            "uri":"https://raw.githubusercontent.com/Onesuretng/Arc-enabled-SQL-Dashboards/workbook/Workbooks/SQL%20Licensing%20Summary.json",
             "contentVersion":"1.0.0.0"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Resources/deployments",
+        "apiVersion": "2022-09-01",
+        "name": "singlePaneofGlassWorkbook",
+        "dependsOn": [
+            "[resourceId('Microsoft.Resources/deployments', 'sqlLicensingWorkbook')]"
+        ],
+        "properties": {
+          "mode": "Incremental",
+          "templateLink": {
+            "uri":"https://raw.githubusercontent.com/Onesuretng/Arc-enabled-SQL-Dashboards/workbook/Workbooks/Arc%20SQL%20Single%20Pane%20of%20Glass.json",
+            "contentVersion":"1.0.0.0"
+          },
+          "parameters": {
+            "licensingWorkbookId": {
+                "value": "[reference('sqlLicensingWorkbook').outputs.workbookId.value]"
+            }
           }
         }
       }
