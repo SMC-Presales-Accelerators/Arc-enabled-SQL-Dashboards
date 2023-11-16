@@ -1,348 +1,57 @@
 {
-  "version": "Notebook/1.0",
-  "items": [
-    {
-      "type": 1,
-      "content": {
-        "json": "## SQL Licensing Summary\r\n\r\nThis provides a basic summary of your potential licensing needs for SQL. If you set up Arc Enabled SQL you will also be able to see your on prem needs also.\r\n\r\nThis licensing summary is based on what is required in the [SQL 2022 Licensing Guide](https://go.microsoft.com/fwlink/p/?linkid=2215573).\r\n\r\n### Definitions\r\n\r\n**Licenses Needed:** Number of 2 Core Packs you have to have on your contract to be compliant.\r\n\r\n**vCores:** Number of cores found by Azure Resource Graph\r\n\r\n### Methodology\r\n\r\nFor **SQL VMs** we are querying all VMs with the SQL IaaS Extension enabled, if it is using the AHUB license type we count the number of cores from the VM Sku, if it is a constrained CPU VM we take the contstrained amount. This number is divided by two and rounded up. Any VM that has less than 4 cores requires 2 licenses. We get the SQL Edition from the Image Type. \r\n\r\nFor **Arc Enabled SQL Servers** we are querying all machines that have been Arc Enabled for SQL, if it is using the Paid license type we count the number of cores reported by Azure Arc. This number is divided by two and rounded up. Any device that has less than 4 cores requires 2 licenses. We get the SQL Edition reported by Azure Arc. TODO: Handle passive secondaries.\r\n\r\nFor **Azure PaaS Databases** we are querying all PaaS DBs that can use AHUB (Azure SQL General Purpose, Business Critical, Hyperscale, Managed Instance, and Elastic Pools). If it is using the AHUB (BasePrice in the query) license type we count the number of cores and divide by 2 rounded up. SQL PaaS Solutions do not have the 4 core minimum of other SQL Servers. We determine edition by mapping General Purpose and Hyperscale to Standard and Business Critical to Enterprise.\r\n\r\nFor **Potential AHUB Licenses** we are using the same query methodologies as above but getting the PAYG license type for VMs and the LicenseIncluded license type for PaaS.\r\n\r\n### Disclaimer\r\n\r\nThe information contained in this workbook and any accompanying materials (including, but not limited to, scripts, sample codes, etc.) are provided “AS-IS” and “WITH ALL FAULTS.” Any estimated pricing information is provided solely for demonstration purposes and does not represent final pricing and Microsoft assumes no liability arising from your use of the information. Microsoft makes NO GUARANTEES OR WARRANTIES OF ANY KIND, WHETHER EXPRESSED OR IMPLIED, in providing this information, including any pricing information."
-      },
-      "name": "text - 2"
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workbookDisplayName": {
+      "type": "string",
+      "defaultValue": "SQL Licensing Summary",
+      "metadata": {
+        "description": "The friendly name for the workbook that is used in the Gallery or Saved List.  This name must be unique within a resource group."
+      }
     },
-    {
-      "type": 12,
-      "content": {
-        "version": "NotebookGroup/1.0",
-        "groupType": "editable",
-        "title": "SQL Licensing Summary",
-        "items": [
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\" and properties.status == \"Connected\"\r\n| extend ServerName = tostring(split(properties.containerResourceId, \"/\")[-1])\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCores = toint(properties.vCore)\r\n| extend licensesNeeded = iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n| extend SqlEdition = tostring(properties.edition)\r\n| project ServerName, licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Arc Connected SQL Servers - Licenses Needed",
-              "noDataMessage": "No Arc Connected SQL Servers need licenses",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false
-              }
-            },
-            "customWidth": "33",
-            "name": "Arc Connected SQL Servers - Licenses Needed"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "Resources\r\n| where type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\" and properties.sqlServerLicenseType == \"AHUB\"\r\n| extend ServerName = tostring(split(properties.virtualMachineResourceId, \"/\")[-1])\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| join kind = leftouter (\r\n    Resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(@\"(\\d+)\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCores = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend SqlEdition = tostring(properties.sqlImageSku)\r\n| extend licensesNeeded = iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n| project ServerName, licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Azure VM SQL Servers - Licenses Needed",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false
-              }
-            },
-            "customWidth": "33",
-            "name": "Azure VM SQL Servers - Licenses Needed"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\"\r\n| where properties.licenseType == \"BasePrice\"\r\n| extend SqlEdition = case(sku.name hasprefix_cs \"GP_\", \"Standard\", sku.name hasprefix_cs \"HS_\", \"Standard\", sku.name hasprefix_cs \"BC_\", \"Enterprise\", \"Unknown\")\r\n| extend vCores = toint(sku.capacity)\r\n| extend licensesNeeded = toint(round(vCores/2))\r\n| project licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Azure PaaS SQL - Licenses Needed",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false
-              }
-            },
-            "customWidth": "33",
-            "name": "Azure PaaS SQL - Licenses Needed"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\" \r\n    or (type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\" and properties.sqlServerLicenseType == \"AHUB\")\r\n    or ((type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\") and properties.licenseType == \"BasePrice\")\r\n| extend Name = tostring(\r\n    coalesce(\r\n        split(properties.virtualMachineResourceId, \"/\")[-1], \r\n        split(properties.containerResourceId, \"/\")[-1],\r\n        name\r\n    )\r\n)\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| extend vCoresPaaS = toint(sku.capacity)\r\n| join kind = leftouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(@\"(\\d+)\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \"GP_\", \"Standard\", sku.name hasprefix_cs \"HS_\", \"Standard\", sku.name hasprefix_cs \"BC_\", \"Enterprise\", \"Unknown\")))\r\n| extend licensesNeeded = iff(\r\n    (type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\"),\r\n    toint(round(vCores/2)),\r\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n)\r\n| project id, licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Total SQL Licenses Needed",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false,
-                "sortCriteriaField": "SqlEdition",
-                "sortOrderField": 1,
-                "size": "auto"
-              }
-            },
-            "name": "Total SQL Licenses Needed"
-          }
-        ]
-      },
-      "name": "SQL Licensing Summary"
+    "workbookType": {
+      "type": "string",
+      "defaultValue": "workbook",
+      "metadata": {
+        "description": "The gallery that the workbook will been shown under. Supported values include workbook, tsg, etc. Usually, this is 'workbook'"
+      }
     },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\r\n| where type == \"microsoft.azurearcdata/sqlserverinstances\" \r\n    or (type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\" and properties.sqlServerLicenseType == \"AHUB\")\r\n    or ((type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\") and properties.licenseType == \"BasePrice\")\r\n| extend Name = tostring(\r\n    coalesce(\r\n        split(properties.virtualMachineResourceId, \"/\")[-1], \r\n        split(properties.containerResourceId, \"/\")[-1],\r\n        name\r\n    )\r\n)\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| extend vCoresPaaS = toint(sku.capacity)\r\n| join kind = leftouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(@\"(\\d+)\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \"GP_\", \"Standard\", sku.name hasprefix_cs \"HS_\", \"Standard\", sku.name hasprefix_cs \"BC_\", \"Enterprise\", \"Unknown\")))\r\n| extend licensesNeeded = iff(\r\n    (type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\"),\r\n    toint(round(vCores/2)),\r\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n)\r\n| project id, licensesNeeded, vCores, SqlEdition",
-        "size": 0,
-        "title": "SQL Licensing Detail",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "value::all"
-        ]
-      },
-      "name": "SQL Licensing Detail"
+    "workbookSourceId": {
+      "type": "string",
+      "defaultValue": "azure monitor",
+      "metadata": {
+        "description": "The id of resource instance to which the workbook will be associated"
+      }
     },
+    "workbookId": {
+      "type": "string",
+      "defaultValue": "[newGuid()]",
+      "metadata": {
+        "description": "The unique guid for this workbook instance"
+      }
+    }
+  },
+  "resources": [
     {
-      "type": 12,
-      "content": {
-        "version": "NotebookGroup/1.0",
-        "groupType": "editable",
-        "title": "Needed Licenses to fully use AHUB with SQL",
-        "items": [
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "Resources\r\n| where type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\" and properties.sqlServerLicenseType == \"PAYG\"\r\n| extend ServerName = tostring(split(properties.virtualMachineResourceId, \"/\")[-1])\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| join kind = leftouter (\r\n    Resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(@\"(\\d+)\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCores = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend SqlEdition = tostring(properties.sqlImageSku)\r\n| extend licensesNeeded = iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n| project ServerName, licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Azure VM SQL Servers - AHUB Potential",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false
-              }
-            },
-            "customWidth": "33",
-            "name": "Azure VM SQL Servers - AHUB Potential"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\"\r\n| where properties.licenseType == \"LicenseIncluded\"\r\n| extend SqlEdition = case(sku.name hasprefix_cs \"GP_\", \"Standard\", sku.name hasprefix_cs \"HS_\", \"Standard\", sku.name hasprefix_cs \"BC_\", \"Enterprise\", \"Unknown\")\r\n| extend vCores = toint(sku.capacity)\r\n| extend licensesNeeded = toint(round(vCores/2))\r\n| project licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Azure PaaS SQL - AHUB Potential",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false
-              }
-            },
-            "customWidth": "33",
-            "name": "Azure PaaS SQL - AHUB Potential"
-          },
-          {
-            "type": 3,
-            "content": {
-              "version": "KqlItem/1.0",
-              "query": "resources\r\n| where (type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\" and properties.sqlServerLicenseType == \"PAYG\")\r\n    or ((type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\") and properties.licenseType == \"LicenseIncluded\")\r\n| extend Name = tostring(\r\n    coalesce(\r\n        split(properties.virtualMachineResourceId, \"/\")[-1], \r\n        split(properties.containerResourceId, \"/\")[-1],\r\n        name\r\n    )\r\n)\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| extend vCoresPaaS = toint(sku.capacity)\r\n| join kind = leftouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(@\"(\\d+)\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \"GP_\", \"Standard\", sku.name hasprefix_cs \"HS_\", \"Standard\", sku.name hasprefix_cs \"BC_\", \"Enterprise\", \"Unknown\")))\r\n| extend licensesNeeded = iff(\r\n    (type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\"),\r\n    toint(round(vCores/2)),\r\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n)\r\n| project id, licensesNeeded, vCores, SqlEdition\r\n| summarize sum(licensesNeeded) by SqlEdition",
-              "size": 3,
-              "title": "Total SQL Licenses Needed",
-              "queryType": 1,
-              "resourceType": "microsoft.resourcegraph/resources",
-              "crossComponentResources": [
-                "value::all"
-              ],
-              "visualization": "tiles",
-              "tileSettings": {
-                "titleContent": {
-                  "columnMatch": "SqlEdition",
-                  "formatter": 1
-                },
-                "leftContent": {
-                  "columnMatch": "sum_licensesNeeded",
-                  "formatter": 12,
-                  "formatOptions": {
-                    "palette": "auto"
-                  },
-                  "numberFormat": {
-                    "unit": 17,
-                    "options": {
-                      "style": "decimal",
-                      "maximumFractionDigits": 2,
-                      "maximumSignificantDigits": 3
-                    }
-                  }
-                },
-                "showBorder": false,
-                "sortCriteriaField": "SqlEdition",
-                "sortOrderField": 1,
-                "size": "auto"
-              }
-            },
-            "name": "Total SQL Licenses Needed"
-          }
-        ]
-      },
-      "name": "Needed Licenses to fully use AHUB with SQL"
-    },
-    {
-      "type": 3,
-      "content": {
-        "version": "KqlItem/1.0",
-        "query": "resources\r\n| where (type == \"microsoft.sqlvirtualmachine/sqlvirtualmachines\" and properties.sqlServerLicenseType == \"PAYG\")\r\n    or ((type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\") and properties.licenseType == \"LicenseIncluded\")\r\n| extend Name = tostring(\r\n    coalesce(\r\n        split(properties.virtualMachineResourceId, \"/\")[-1], \r\n        split(properties.containerResourceId, \"/\")[-1],\r\n        name\r\n    )\r\n)\r\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\r\n| extend vCoresArc = toint(properties.vCore)\r\n| extend vCoresPaaS = toint(sku.capacity)\r\n| join kind = leftouter (\r\n    resources\r\n    | where type == \"microsoft.compute/virtualmachines\"\r\n    | extend vCoresArray = extract_all(@\"(\\d+)\", tostring(properties.hardwareProfile.vmSize))\r\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \"-\", toint(vCoresArray[1]), toint(vCoresArray[0]))\r\n)\r\non $left.vmResourceId == $right.vmid\r\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\r\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \"GP_\", \"Standard\", sku.name hasprefix_cs \"HS_\", \"Standard\", sku.name hasprefix_cs \"BC_\", \"Enterprise\", \"Unknown\")))\r\n| extend licensesNeeded = iff(\r\n    (type == \"microsoft.sql/servers/databases\" or type == \"microsoft.sql/managedinstances\" or type == \"microsoft.sql/servers/elasticpools\"),\r\n    toint(round(vCores/2)),\r\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\r\n)\r\n| project id, licensesNeeded, vCores, SqlEdition",
-        "size": 0,
-        "title": "SQL AHUB Potential  Detail",
-        "showExportToExcel": true,
-        "queryType": 1,
-        "resourceType": "microsoft.resourcegraph/resources",
-        "crossComponentResources": [
-          "value::all"
-        ]
-      },
-      "name": "SQL AHUB Potential  Detail"
+      "name": "[parameters('workbookId')]",
+      "type": "microsoft.insights/workbooks",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "2022-04-01",
+      "dependsOn": [],
+      "kind": "shared",
+      "properties": {
+        "displayName": "[parameters('workbookDisplayName')]",
+        "serializedData": "{\"version\":\"Notebook/1.0\",\"items\":[{\"type\":1,\"content\":{\"json\":\"## SQL Licensing Summary\\r\\n\\r\\nThis provides a basic summary of your potential licensing needs for SQL. If you set up Arc Enabled SQL you will also be able to see your on prem needs also.\\r\\n\\r\\nThis licensing summary is based on what is required in the [SQL 2022 Licensing Guide](https://go.microsoft.com/fwlink/p/?linkid=2215573).\\r\\n\\r\\n### Definitions\\r\\n\\r\\n**Licenses Needed:** Number of 2 Core Packs you have to have on your contract to be compliant.\\r\\n\\r\\n**vCores:** Number of cores found by Azure Resource Graph\\r\\n\\r\\n### Methodology\\r\\n\\r\\nFor **SQL VMs** we are querying all VMs with the SQL IaaS Extension enabled, if it is using the AHUB license type we count the number of cores from the VM Sku, if it is a constrained CPU VM we take the contstrained amount. This number is divided by two and rounded up. Any VM that has less than 4 cores requires 2 licenses. We get the SQL Edition from the Image Type. \\r\\n\\r\\nFor **Arc Enabled SQL Servers** we are querying all machines that have been Arc Enabled for SQL, if it is using the Paid license type we count the number of cores reported by Azure Arc. This number is divided by two and rounded up. Any device that has less than 4 cores requires 2 licenses. We get the SQL Edition reported by Azure Arc. TODO: Handle passive secondaries.\\r\\n\\r\\nFor **Azure PaaS Databases** we are querying all PaaS DBs that can use AHUB (Azure SQL General Purpose, Business Critical, Hyperscale, Managed Instance, and Elastic Pools). If it is using the AHUB (BasePrice in the query) license type we count the number of cores and divide by 2 rounded up. SQL PaaS Solutions do not have the 4 core minimum of other SQL Servers. We determine edition by mapping General Purpose and Hyperscale to Standard and Business Critical to Enterprise.\\r\\n\\r\\nFor **Potential AHUB Licenses** we are using the same query methodologies as above but getting the PAYG license type for VMs and the LicenseIncluded license type for PaaS.\\r\\n\\r\\n### Disclaimer\\r\\n\\r\\nThe information contained in this workbook and any accompanying materials (including, but not limited to, scripts, sample codes, etc.) are provided “AS-IS” and “WITH ALL FAULTS.” Any estimated pricing information is provided solely for demonstration purposes and does not represent final pricing and Microsoft assumes no liability arising from your use of the information. Microsoft makes NO GUARANTEES OR WARRANTIES OF ANY KIND, WHETHER EXPRESSED OR IMPLIED, in providing this information, including any pricing information.\"},\"name\":\"text - 2\"},{\"type\":12,\"content\":{\"version\":\"NotebookGroup/1.0\",\"groupType\":\"editable\",\"title\":\"SQL Licensing Summary\",\"items\":[{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where type == \\\"microsoft.azurearcdata/sqlserverinstances\\\" and properties.status == \\\"Connected\\\"\\r\\n| extend ServerName = tostring(split(properties.containerResourceId, \\\"/\\\")[-1])\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| extend vCores = toint(properties.vCore)\\r\\n| extend licensesNeeded = iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n| extend SqlEdition = tostring(properties.edition)\\r\\n| project ServerName, licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Arc Connected SQL Servers - Licenses Needed\",\"noDataMessage\":\"No Arc Connected SQL Servers need licenses\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false}},\"customWidth\":\"33\",\"name\":\"Arc Connected SQL Servers - Licenses Needed\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"Resources\\r\\n| where type == \\\"microsoft.sqlvirtualmachine/sqlvirtualmachines\\\" and properties.sqlServerLicenseType == \\\"AHUB\\\"\\r\\n| extend ServerName = tostring(split(properties.virtualMachineResourceId, \\\"/\\\")[-1])\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| join kind = leftouter (\\r\\n    Resources\\r\\n    | where type == \\\"microsoft.compute/virtualmachines\\\"\\r\\n    | extend vCoresArray = extract_all(@\\\"(\\\\d+)\\\", tostring(properties.hardwareProfile.vmSize))\\r\\n    | project vmid = tolower(id), vCores = iff(tostring(properties.hardwareProfile.vmSize) contains \\\"-\\\", toint(vCoresArray[1]), toint(vCoresArray[0]))\\r\\n)\\r\\non $left.vmResourceId == $right.vmid\\r\\n| extend SqlEdition = tostring(properties.sqlImageSku)\\r\\n| extend licensesNeeded = iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n| project ServerName, licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Azure VM SQL Servers - Licenses Needed\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false}},\"customWidth\":\"33\",\"name\":\"Azure VM SQL Servers - Licenses Needed\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\"\\r\\n| where properties.licenseType == \\\"BasePrice\\\"\\r\\n| extend SqlEdition = case(sku.name hasprefix_cs \\\"GP_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"HS_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"BC_\\\", \\\"Enterprise\\\", \\\"Unknown\\\")\\r\\n| extend vCores = toint(sku.capacity)\\r\\n| extend licensesNeeded = toint(round(vCores/2))\\r\\n| project licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Azure PaaS SQL - Licenses Needed\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false}},\"customWidth\":\"33\",\"name\":\"Azure PaaS SQL - Licenses Needed\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where type == \\\"microsoft.azurearcdata/sqlserverinstances\\\" \\r\\n    or (type == \\\"microsoft.sqlvirtualmachine/sqlvirtualmachines\\\" and properties.sqlServerLicenseType == \\\"AHUB\\\")\\r\\n    or ((type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\") and properties.licenseType == \\\"BasePrice\\\")\\r\\n| extend Name = tostring(\\r\\n    coalesce(\\r\\n        split(properties.virtualMachineResourceId, \\\"/\\\")[-1], \\r\\n        split(properties.containerResourceId, \\\"/\\\")[-1],\\r\\n        name\\r\\n    )\\r\\n)\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| extend vCoresArc = toint(properties.vCore)\\r\\n| extend vCoresPaaS = toint(sku.capacity)\\r\\n| join kind = leftouter (\\r\\n    resources\\r\\n    | where type == \\\"microsoft.compute/virtualmachines\\\"\\r\\n    | extend vCoresArray = extract_all(@\\\"(\\\\d+)\\\", tostring(properties.hardwareProfile.vmSize))\\r\\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \\\"-\\\", toint(vCoresArray[1]), toint(vCoresArray[0]))\\r\\n)\\r\\non $left.vmResourceId == $right.vmid\\r\\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\\r\\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \\\"GP_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"HS_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"BC_\\\", \\\"Enterprise\\\", \\\"Unknown\\\")))\\r\\n| extend licensesNeeded = iff(\\r\\n    (type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\"),\\r\\n    toint(round(vCores/2)),\\r\\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n)\\r\\n| project id, licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Total SQL Licenses Needed\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false,\"sortCriteriaField\":\"SqlEdition\",\"sortOrderField\":1,\"size\":\"auto\"}},\"name\":\"Total SQL Licenses Needed\"}]},\"name\":\"SQL Licensing Summary\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where type == \\\"microsoft.azurearcdata/sqlserverinstances\\\" \\r\\n    or (type == \\\"microsoft.sqlvirtualmachine/sqlvirtualmachines\\\" and properties.sqlServerLicenseType == \\\"AHUB\\\")\\r\\n    or ((type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\") and properties.licenseType == \\\"BasePrice\\\")\\r\\n| extend Name = tostring(\\r\\n    coalesce(\\r\\n        split(properties.virtualMachineResourceId, \\\"/\\\")[-1], \\r\\n        split(properties.containerResourceId, \\\"/\\\")[-1],\\r\\n        name\\r\\n    )\\r\\n)\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| extend vCoresArc = toint(properties.vCore)\\r\\n| extend vCoresPaaS = toint(sku.capacity)\\r\\n| join kind = leftouter (\\r\\n    resources\\r\\n    | where type == \\\"microsoft.compute/virtualmachines\\\"\\r\\n    | extend vCoresArray = extract_all(@\\\"(\\\\d+)\\\", tostring(properties.hardwareProfile.vmSize))\\r\\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \\\"-\\\", toint(vCoresArray[1]), toint(vCoresArray[0]))\\r\\n)\\r\\non $left.vmResourceId == $right.vmid\\r\\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\\r\\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \\\"GP_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"HS_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"BC_\\\", \\\"Enterprise\\\", \\\"Unknown\\\")))\\r\\n| extend licensesNeeded = iff(\\r\\n    (type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\"),\\r\\n    toint(round(vCores/2)),\\r\\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n)\\r\\n| project id, licensesNeeded, vCores, SqlEdition\",\"size\":0,\"title\":\"SQL Licensing Detail\",\"showExportToExcel\":true,\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"]},\"name\":\"SQL Licensing Detail\"},{\"type\":12,\"content\":{\"version\":\"NotebookGroup/1.0\",\"groupType\":\"editable\",\"title\":\"Needed Licenses to fully use AHUB with SQL\",\"items\":[{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"Resources\\r\\n| where type == \\\"microsoft.sqlvirtualmachine/sqlvirtualmachines\\\" and properties.sqlServerLicenseType == \\\"PAYG\\\"\\r\\n| extend ServerName = tostring(split(properties.virtualMachineResourceId, \\\"/\\\")[-1])\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| join kind = leftouter (\\r\\n    Resources\\r\\n    | where type == \\\"microsoft.compute/virtualmachines\\\"\\r\\n    | extend vCoresArray = extract_all(@\\\"(\\\\d+)\\\", tostring(properties.hardwareProfile.vmSize))\\r\\n    | project vmid = tolower(id), vCores = iff(tostring(properties.hardwareProfile.vmSize) contains \\\"-\\\", toint(vCoresArray[1]), toint(vCoresArray[0]))\\r\\n)\\r\\non $left.vmResourceId == $right.vmid\\r\\n| extend SqlEdition = tostring(properties.sqlImageSku)\\r\\n| extend licensesNeeded = iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n| project ServerName, licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Azure VM SQL Servers - AHUB Potential\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false}},\"customWidth\":\"33\",\"name\":\"Azure VM SQL Servers - AHUB Potential\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\"\\r\\n| where properties.licenseType == \\\"LicenseIncluded\\\"\\r\\n| extend SqlEdition = case(sku.name hasprefix_cs \\\"GP_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"HS_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"BC_\\\", \\\"Enterprise\\\", \\\"Unknown\\\")\\r\\n| extend vCores = toint(sku.capacity)\\r\\n| extend licensesNeeded = toint(round(vCores/2))\\r\\n| project licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Azure PaaS SQL - AHUB Potential\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false}},\"customWidth\":\"33\",\"name\":\"Azure PaaS SQL - AHUB Potential\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where (type == \\\"microsoft.sqlvirtualmachine/sqlvirtualmachines\\\" and properties.sqlServerLicenseType == \\\"PAYG\\\")\\r\\n    or ((type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\") and properties.licenseType == \\\"LicenseIncluded\\\")\\r\\n| extend Name = tostring(\\r\\n    coalesce(\\r\\n        split(properties.virtualMachineResourceId, \\\"/\\\")[-1], \\r\\n        split(properties.containerResourceId, \\\"/\\\")[-1],\\r\\n        name\\r\\n    )\\r\\n)\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| extend vCoresArc = toint(properties.vCore)\\r\\n| extend vCoresPaaS = toint(sku.capacity)\\r\\n| join kind = leftouter (\\r\\n    resources\\r\\n    | where type == \\\"microsoft.compute/virtualmachines\\\"\\r\\n    | extend vCoresArray = extract_all(@\\\"(\\\\d+)\\\", tostring(properties.hardwareProfile.vmSize))\\r\\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \\\"-\\\", toint(vCoresArray[1]), toint(vCoresArray[0]))\\r\\n)\\r\\non $left.vmResourceId == $right.vmid\\r\\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\\r\\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \\\"GP_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"HS_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"BC_\\\", \\\"Enterprise\\\", \\\"Unknown\\\")))\\r\\n| extend licensesNeeded = iff(\\r\\n    (type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\"),\\r\\n    toint(round(vCores/2)),\\r\\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n)\\r\\n| project id, licensesNeeded, vCores, SqlEdition\\r\\n| summarize sum(licensesNeeded) by SqlEdition\",\"size\":3,\"title\":\"Total SQL Licenses Needed\",\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"],\"visualization\":\"tiles\",\"tileSettings\":{\"titleContent\":{\"columnMatch\":\"SqlEdition\",\"formatter\":1},\"leftContent\":{\"columnMatch\":\"sum_licensesNeeded\",\"formatter\":12,\"formatOptions\":{\"palette\":\"auto\"},\"numberFormat\":{\"unit\":17,\"options\":{\"style\":\"decimal\",\"maximumFractionDigits\":2,\"maximumSignificantDigits\":3}}},\"showBorder\":false,\"sortCriteriaField\":\"SqlEdition\",\"sortOrderField\":1,\"size\":\"auto\"}},\"name\":\"Total SQL Licenses Needed\"}]},\"name\":\"Needed Licenses to fully use AHUB with SQL\"},{\"type\":3,\"content\":{\"version\":\"KqlItem/1.0\",\"query\":\"resources\\r\\n| where (type == \\\"microsoft.sqlvirtualmachine/sqlvirtualmachines\\\" and properties.sqlServerLicenseType == \\\"PAYG\\\")\\r\\n    or ((type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\") and properties.licenseType == \\\"LicenseIncluded\\\")\\r\\n| extend Name = tostring(\\r\\n    coalesce(\\r\\n        split(properties.virtualMachineResourceId, \\\"/\\\")[-1], \\r\\n        split(properties.containerResourceId, \\\"/\\\")[-1],\\r\\n        name\\r\\n    )\\r\\n)\\r\\n| extend vmResourceId = tolower(tostring(properties.virtualMachineResourceId))\\r\\n| extend vCoresArc = toint(properties.vCore)\\r\\n| extend vCoresPaaS = toint(sku.capacity)\\r\\n| join kind = leftouter (\\r\\n    resources\\r\\n    | where type == \\\"microsoft.compute/virtualmachines\\\"\\r\\n    | extend vCoresArray = extract_all(@\\\"(\\\\d+)\\\", tostring(properties.hardwareProfile.vmSize))\\r\\n    | project vmid = tolower(id), vCoresVm = iff(tostring(properties.hardwareProfile.vmSize) contains \\\"-\\\", toint(vCoresArray[1]), toint(vCoresArray[0]))\\r\\n)\\r\\non $left.vmResourceId == $right.vmid\\r\\n| extend vCores = coalesce(vCoresArc, vCoresVm, vCoresPaaS)\\r\\n| extend SqlEdition = tostring(coalesce(properties.sqlImageSku, properties.edition, case(sku.name hasprefix_cs \\\"GP_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"HS_\\\", \\\"Standard\\\", sku.name hasprefix_cs \\\"BC_\\\", \\\"Enterprise\\\", \\\"Unknown\\\")))\\r\\n| extend licensesNeeded = iff(\\r\\n    (type == \\\"microsoft.sql/servers/databases\\\" or type == \\\"microsoft.sql/managedinstances\\\" or type == \\\"microsoft.sql/servers/elasticpools\\\"),\\r\\n    toint(round(vCores/2)),\\r\\n    iff(vCores >= 4, toint(round(vCores/2)), 2)\\r\\n)\\r\\n| project id, licensesNeeded, vCores, SqlEdition\",\"size\":0,\"title\":\"SQL AHUB Potential  Detail\",\"showExportToExcel\":true,\"queryType\":1,\"resourceType\":\"microsoft.resourcegraph/resources\",\"crossComponentResources\":[\"value::all\"]},\"name\":\"SQL AHUB Potential  Detail\"}],\"isLocked\":false,\"fallbackResourceIds\":[\"azure monitor\"]}",
+        "version": "1.0",
+        "sourceId": "[parameters('workbookSourceId')]",
+        "category": "[parameters('workbookType')]"
+      }
     }
   ],
-  "fallbackResourceIds": [
-    "azure monitor"
-  ],
-  "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  "outputs": {
+    "workbookId": {
+      "type": "string",
+      "value": "[resourceId( 'microsoft.insights/workbooks', parameters('workbookId'))]"
+    }
+  },
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#"
 }
