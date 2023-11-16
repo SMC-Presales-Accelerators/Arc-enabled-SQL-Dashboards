@@ -11,7 +11,7 @@
         "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri":"https://raw.githubusercontent.com/Onesuretng/Arc-enabled-SQL-Dashboards/workbook/Workbooks/SQL%20Licensing%20Summary.json",
+            "uri":"https://raw.githubusercontent.com/Onesuretng/Arc-enabled-SQL-Dashboards/main/Workbooks/SQL%20Licensing%20Summary.json",
             "contentVersion":"1.0.0.0"
           }
         }
@@ -26,7 +26,7 @@
         "properties": {
           "mode": "Incremental",
           "templateLink": {
-            "uri":"https://raw.githubusercontent.com/Onesuretng/Arc-enabled-SQL-Dashboards/workbook/Workbooks/Arc%20SQL%20Single%20Pane%20of%20Glass.json",
+            "uri":"https://raw.githubusercontent.com/Onesuretng/Arc-enabled-SQL-Dashboards/main/Workbooks/Arc%20SQL%20Single%20Pane%20of%20Glass.json",
             "contentVersion":"1.0.0.0"
           },
           "parameters": {
