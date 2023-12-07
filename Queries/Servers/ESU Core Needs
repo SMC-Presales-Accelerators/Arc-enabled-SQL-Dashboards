@@ -14,13 +14,14 @@ resources
 on $left.joinId == $right.arcMachineId
 | where properties.osSku contains "2012" or sqlVersion contains "2012"
 | extend virtualized = iff(properties.detectedProperties.model == "Virtual Machine" or properties.detectedProperties.manufacturer == "VMware, Inc.", true, false)
-| extend coresPerProcessor = toint(properties.detectedProperties.coreCount)
+| extend isVmware = iff(properties.detectedProperties.manufacturer == "VMware, Inc.", true, false)
+| extend totalCoreCount = toint(properties.detectedProperties.coreCount)
 | extend physicalProcessors = toint(properties.detectedProperties.processorCount)
-| extend physicalCores = coresPerProcessor * physicalProcessors
-| extend windowsSku = split(properties.osSku, " ", 3)[0]
+| extend windowsSkuHold = split(properties.osSku, " ")
+| extend windowsSku = iif(windowsSkuHold[3] == 'R2', windowsSkuHold[4], windowsSkuHold[3])
 | extend windowsESUCountMinimum = iif(virtualized, 8, 16) // 16 core server minimum / 2 core pack
-| extend windowsESUCountPhysicalProcessors = physicalProcessors * 8 // 8 core minimum per processor / 2 core pack
-| extend windowsESUCountPhysicalCores = physicalCores // Divide by 2 for 2 core pack
+| extend windowsESUCountPhysicalProcessors = iff(isVmware, 0, physicalProcessors * 8) // 8 core minimum per processor / 2 core pack
+| extend windowsESUCountPhysicalCores = totalCoreCount // Divide by 2 for 2 core pack
 | extend windowsESUCores = iif(properties.osSku contains "2012", max_of(windowsESUCountMinimum, windowsESUCountPhysicalProcessors, windowsESUCountPhysicalCores), 0)
 | extend sqlESUCores = iif(sqlVersion contains "2012", iif(sqlVcores < 4, 4, sqlVcores), 0)
 | project id, name, virtualized, windowsVersion = properties.osSku, windowsSku, windowsESUCores, sqlVersion, sqlEdition, sqlESUCores
