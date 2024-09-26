@@ -23,3 +23,6 @@ Click the button below to deploy to your Azure Subscription:
 
 ### The Backups Tab gives a full report of your backups on all Arc Enabled SQL Servers and a single area to see your auto backup settings
 ![Azure Arc Enabled SQL Server Single Pane of Glass Backups Tab Screenshot](images/backup_tab_workbook.png)
+
+### The Availability Groups Tab gives a tree based view of the health of all your Always On Availability Groups
+![Azure Arc Enabled SQL Server Single Pane of Glass Availability Groups Tab Screenshot](images/aoag_tab_workbook.png)
